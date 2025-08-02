@@ -1,47 +1,84 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Trang Bán Hàng</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa Đơn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .invoice {
+            width: 80%;
+            margin: 20px auto;
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Chào mừng đến với trang bán hàng của tôi!</h1>
-  <p>Đây là trang đầu tiên trên GitHub Pages.</p>
-
-  <div id="info"></div>
-
-  <script>
-    // Hàm lấy tham số từ URL
-    function getQueryParams() {
-      const params = {};
-      window.location.search
-        .substring(1)
-        .split("&")
-        .forEach(pair => {
-          const [key, value] = pair.split("=");
-          if (key) {
-            params[key] = decodeURIComponent(value || "");
-          }
-        });
-      return params;
-    }
-
-    const params = getQueryParams();
-
-    // Hiển thị thông tin lấy từ URL
-    if (params.mahoadon || params.khachhang || params.ngayban || params.data) {
-      const infoDiv = document.getElementById("info");
-      infoDiv.innerHTML = `
-        <h2>Thông tin đơn hàng:</h2>
-        <ul>
-          <li><b>Mã hoá đơn:</b> ${params.mahoadon || "Chưa có"}</li>
-          <li><b>Khách hàng:</b> ${params.khachhang || "Chưa có"}</li>
-          <li><b>Ngày bán:</b> ${params.ngayban || "Chưa có"}</li>
-          <li><b>Sản phẩm:</b> ${params.data ? params.data.split("_b_").join(", ") : "Chưa có"}</li>
-        </ul>
-      `;
-    }
-  </script>
+    <div class="invoice">
+        <div class="header">HOÁ ĐƠN</div>
+        <div class="info">
+            <p>Tên khách: [Tên khách]</p>
+            <p>Ngày bán: [Ngày bán]</p>
+        </div>
+        <table>
+            <tr>
+                <th>STT</th>
+                <th>Tên hàng</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Sản phẩm A</td>
+                <td>2</td>
+                <td>100000</td>
+                <td>200000</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Sản phẩm B</td>
+                <td>1</td>
+                <td>150000</td>
+                <td>150000</td>
+            </tr>
+        </table>
+        <div class="total">Tổng giá: 350000</div>
+    </div>
 </body>
 </html>
-
