@@ -5,57 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hóa Đơn</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .invoice {
-            width: 80%;
-            margin: 20px auto;
-            border: 1px solid #000;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .info {
-            margin-bottom: 20px;
-        }
-        .info p {
-            margin: 5px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .total {
-            font-weight: bold;
-            text-align: right;
-            margin-top: 10px;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .invoice { width: 80%; margin: 20px auto; border: 1px solid #000; padding: 20px; }
+        .header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .info { margin-bottom: 20px; }
+        .info p { margin: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .total { font-weight: bold; text-align: right; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="invoice">
         <div class="header">HOÁ ĐƠN</div>
         <div class="info">
-            <p>Tên khách: [Tên khách]</p>
-            <p>Ngày bán: [Ngày bán]</p>
+            <p id="tenKhach">Tên khách: [Tên khách]</p>
+            <p id="ngayBan">Ngày bán: [Ngày bán]</p>
         </div>
-        <table>
+        <table id="invoiceTable">
             <tr>
                 <th>STT</th>
                 <th>Tên hàng</th>
@@ -63,22 +31,36 @@
                 <th>Đơn giá</th>
                 <th>Thành tiền</th>
             </tr>
-            <tr>
-                <td>1</td>
-                <td>Sản phẩm A</td>
-                <td>2</td>
-                <td>100000</td>
-                <td>200000</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Sản phẩm B</td>
-                <td>1</td>
-                <td>150000</td>
-                <td>150000</td>
-            </tr>
         </table>
-        <div class="total">Tổng giá: 350000</div>
+        <div class="total" id="tongGia">Tổng giá: 0</div>
     </div>
+
+    <script>
+        // Lấy tham số từ URL (AppSheet có thể đẩy qua deep link)
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('tenKhach').textContent = `Tên khách: ${urlParams.get('khachhang') || '[Tên khách]'}`;
+        document.getElementById('ngayBan').textContent = `Ngày bán: ${urlParams.get('ngayban') || '[Ngày bán]'}`;
+
+        // Dữ liệu mẫu (thay bằng API hoặc deep link từ AppSheet)
+        const data = [
+            { stt: 1, tenHang: 'Sản phẩm A', soLuong: 2, donGia: 100000, thanhTien: 200000 },
+            { stt: 2, tenHang: 'Sản phẩm B', soLuong: 1, donGia: 150000, thanhTien: 150000 }
+        ];
+
+        // Hiển thị bảng
+        const table = document.getElementById('invoiceTable');
+        data.forEach(item => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = item.stt;
+            row.insertCell(1).textContent = item.tenHang;
+            row.insertCell(2).textContent = item.soLuong;
+            row.insertCell(3).textContent = item.donGia.toLocaleString() + ' VNĐ';
+            row.insertCell(4).textContent = item.thanhTien.toLocaleString() + ' VNĐ';
+        });
+
+        // Tính và hiển thị tổng giá
+        const tongGia = data.reduce((sum, item) => sum + item.thanhTien, 0);
+        document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+    </script>
 </body>
 </html>
