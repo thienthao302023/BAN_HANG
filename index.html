@@ -12,7 +12,7 @@
         .info p { margin: 5px 0; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #000; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
+        th { background-color: #e0e0e0; }
         .total { font-weight: bold; text-align: right; margin-top: 10px; }
     </style>
 </head>
@@ -20,7 +20,7 @@
     <div class="invoice">
         <div class="header">HOÁ ĐƠN</div>
         <div class="info">
-            <p id="tenKhach">Tên khách: [Tên khách]</p>
+            <p id="tenKhach">KHÁCH HÀNG: [KHÁCH HÀNG]</p>
             <p id="ngayBan">Ngày bán: [Ngày bán]</p>
         </div>
         <table id="invoiceTable">
@@ -31,18 +31,18 @@
                 <th>THÀNH TIỀN</th>
             </tr>
         </table>
-        <div class="total" id="tongGia">Tổng giá: 0</div>
+        <div class="total" id="tongGia">Tổng giá: 0 VNĐ</div>
     </div>
 
     <script>
         // Lấy tham số từ URL
         const urlParams = new URLSearchParams(window.location.search);
-        const tenKhach = urlParams.get('khachhang') || '[Tên khách]';
+        const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
         const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
         const data = urlParams.get('data') || '';
 
         // Hiển thị thông tin cơ bản
-        document.getElementById('tenKhach').textContent = `Tên khách: ${decodeURIComponent(tenKhach)}`;
+        document.getElementById('tenKhach').textContent = `KHÁCH HÀNG: ${decodeURIComponent(tenKhach)}`;
         document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
         // Phân tích dữ liệu chi tiết
@@ -54,14 +54,16 @@
                     const row = table.insertRow();
                     row.insertCell(0).textContent = items[i]; // SẢN PHẦM
                     row.insertCell(1).textContent = items[i + 1]; // SỐ LƯỢNG
-                    row.insertCell(2).textContent = parseInt(items[i + 2]).toLocaleString() + ' VNĐ'; // ĐƠN GIÁ
-                    row.insertCell(3).textContent = parseInt(items[i + 3]).toLocaleString() + ' VNĐ'; // THÀNH TIỀN
+                    const donGia = parseInt(items[i + 2]) || 0;
+                    const thanhTien = parseInt(items[i + 3]) || 0;
+                    row.insertCell(2).textContent = donGia.toLocaleString() + ' VNĐ'; // ĐƠN GIÁ
+                    row.insertCell(3).textContent = thanhTien.toLocaleString() + ' VNĐ'; // THÀNH TIỀN
                 }
             }
 
             // Tính tổng giá
             const tongGia = items.reduce((sum, value, index) => {
-                return index % 4 === 3 ? sum + parseInt(value) : sum;
+                return index % 4 === 3 && !isNaN(parseInt(value)) ? sum + parseInt(value) : sum;
             }, 0);
             document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
         }
