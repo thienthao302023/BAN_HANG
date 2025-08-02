@@ -25,42 +25,46 @@
         </div>
         <table id="invoiceTable">
             <tr>
-                <th>STT</th>
-                <th>Tên hàng</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
+                <th>SẢN PHẦM</th>
+                <th>SỐ LƯỢNG</th>
+                <th>ĐƠN GIÁ</th>
+                <th>THÀNH TIỀN</th>
             </tr>
         </table>
         <div class="total" id="tongGia">Tổng giá: 0</div>
     </div>
 
     <script>
-        // Lấy tham số từ URL (AppSheet có thể đẩy qua deep link)
+        // Lấy tham số từ URL
         const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('tenKhach').textContent = `Tên khách: ${urlParams.get('khachhang') || '[Tên khách]'}`;
-        document.getElementById('ngayBan').textContent = `Ngày bán: ${urlParams.get('ngayban') || '[Ngày bán]'}`;
+        const tenKhach = urlParams.get('khachhang') || '[Tên khách]';
+        const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+        const data = urlParams.get('data') || '';
 
-        // Dữ liệu mẫu (thay bằng API hoặc deep link từ AppSheet)
-        const data = [
-            { stt: 1, tenHang: 'Sản phẩm A', soLuong: 2, donGia: 100000, thanhTien: 200000 },
-            { stt: 2, tenHang: 'Sản phẩm B', soLuong: 1, donGia: 150000, thanhTien: 150000 }
-        ];
+        // Hiển thị thông tin cơ bản
+        document.getElementById('tenKhach').textContent = `Tên khách: ${decodeURIComponent(tenKhach)}`;
+        document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-        // Hiển thị bảng
-        const table = document.getElementById('invoiceTable');
-        data.forEach(item => {
-            const row = table.insertRow();
-            row.insertCell(0).textContent = item.stt;
-            row.insertCell(1).textContent = item.tenHang;
-            row.insertCell(2).textContent = item.soLuong;
-            row.insertCell(3).textContent = item.donGia.toLocaleString() + ' VNĐ';
-            row.insertCell(4).textContent = item.thanhTien.toLocaleString() + ' VNĐ';
-        });
+        // Phân tích dữ liệu chi tiết
+        if (data) {
+            const items = decodeURIComponent(data).split('_b_');
+            const table = document.getElementById('invoiceTable');
+            for (let i = 0; i < items.length; i += 4) {
+                if (i + 3 < items.length) {
+                    const row = table.insertRow();
+                    row.insertCell(0).textContent = items[i]; // SẢN PHẦM
+                    row.insertCell(1).textContent = items[i + 1]; // SỐ LƯỢNG
+                    row.insertCell(2).textContent = parseInt(items[i + 2]).toLocaleString() + ' VNĐ'; // ĐƠN GIÁ
+                    row.insertCell(3).textContent = parseInt(items[i + 3]).toLocaleString() + ' VNĐ'; // THÀNH TIỀN
+                }
+            }
 
-        // Tính và hiển thị tổng giá
-        const tongGia = data.reduce((sum, item) => sum + item.thanhTien, 0);
-        document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+            // Tính tổng giá
+            const tongGia = items.reduce((sum, value, index) => {
+                return index % 4 === 3 ? sum + parseInt(value) : sum;
+            }, 0);
+            document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+        }
     </script>
 </body>
 </html>
