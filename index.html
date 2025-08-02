@@ -49,22 +49,21 @@
         if (data) {
             const items = decodeURIComponent(data).split('_b_');
             const table = document.getElementById('invoiceTable');
+            let tongGia = 0;
+
             for (let i = 0; i < items.length; i += 4) {
                 if (i + 3 < items.length) {
                     const row = table.insertRow();
-                    row.insertCell(0).textContent = items[i]; // SẢN PHẦM
-                    row.insertCell(1).textContent = items[i + 1]; // SỐ LƯỢNG
+                    row.insertCell(0).textContent = items[i] || ''; // SẢN PHẦM
+                    row.insertCell(1).textContent = items[i + 1] || ''; // SỐ LƯỢNG
                     const donGia = parseInt(items[i + 2]) || 0;
                     const thanhTien = parseInt(items[i + 3]) || 0;
                     row.insertCell(2).textContent = donGia.toLocaleString() + ' VNĐ'; // ĐƠN GIÁ
                     row.insertCell(3).textContent = thanhTien.toLocaleString() + ' VNĐ'; // THÀNH TIỀN
+                    tongGia += thanhTien;
                 }
             }
 
-            // Tính tổng giá
-            const tongGia = items.reduce((sum, value, index) => {
-                return index % 4 === 3 && !isNaN(parseInt(value)) ? sum + parseInt(value) : sum;
-            }, 0);
             document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
         }
     </script>
