@@ -1,72 +1,94 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hóa Đơn</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .invoice { width: 80%; margin: 20px auto; border: 1px solid #000; padding: 20px; }
-        .header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-        .info { margin-bottom: 20px; }
-        .info p { margin: 5px 0; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
-        th { background-color: #e0e0e0; }
-        .total { font-weight: bold; text-align: right; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hóa Đơn</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .invoice { width: 80%; margin: 20px auto; border: 1px solid #000; padding: 20px; }
+    .header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+    .info { margin-bottom: 20px; }
+    .info p { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+    th { background-color: #e0e0e0; }
+    .total { font-weight: bold; text-align: right; margin-top: 10px; }
+    #btnPdf { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
 </head>
 <body>
-    <div class="invoice">
-        <div class="header">HOÁ ĐƠN</div>
-        <div class="info">
-            <p id="tenKhach">KHÁCH HÀNG: [KHÁCH HÀNG]</p>
-            <p id="ngayBan">Ngày bán: [Ngày bán]</p>
-        </div>
-        <table id="invoiceTable">
-            <tr>
-                <th>SẢN PHẨM</th>
-                <th>SỐ LƯỢNG</th>
-                <th>ĐƠN GIÁ</th>
-                <th>THÀNH TIỀN</th>
-            </tr>
-        </table>
-        <div class="total" id="tongGia">Tổng giá: 0 VNĐ</div>
+  <div class="invoice" id="invoiceContent">
+    <div class="header">HOÁ ĐƠN</div>
+    <div class="info">
+      <p id="tenKhach">KHÁCH HÀNG: [KHÁCH HÀNG]</p>
+      <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
+    <table id="invoiceTable">
+      <tr>
+        <th>SẢN PHẨM</th>
+        <th>SỐ LƯỢNG</th>
+        <th>ĐƠN GIÁ</th>
+        <th>THÀNH TIỀN</th>
+      </tr>
+    </table>
+    <div class="total" id="tongGia">Tổng giá: 0 VNĐ</div>
+  </div>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
-        const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-        const data = urlParams.get('data') || '';
+  <button id="btnPdf">Xuất PDF hóa đơn</button>
 
-        // Hiển thị thông tin khách và ngày bán
-        document.getElementById('tenKhach').textContent = `KHÁCH HÀNG: ${decodeURIComponent(tenKhach)}`;
-        document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
 
-        // Xử lý dữ liệu sản phẩm
-        if (data) {
-            const rows = decodeURIComponent(data).split('_b_');
-            const table = document.getElementById('invoiceTable');
-            let tongGia = 0;
+    const urlParams = new URLSearchParams(window.location.search);
+    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
+    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+    const data = urlParams.get('data') || '';
 
-            rows.forEach(record => {
-                const items = record.split('_a_');
-                if (items.length >= 4) {
-                    const row = table.insertRow();
-                    row.insertCell(0).textContent = items[0]; // SẢN PHẨM
-                    row.insertCell(1).textContent = items[1]; // SỐ LƯỢNG
-                    const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
-                    const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-                    row.insertCell(2).textContent = donGia.toLocaleString() + ' VNĐ'; // ĐƠN GIÁ
-                    row.insertCell(3).textContent = thanhTien.toLocaleString() + ' VNĐ'; // THÀNH TIỀN
-                    tongGia += thanhTien;
-                }
-            });
+    document.getElementById('tenKhach').textContent = `KHÁCH HÀNG: ${decodeURIComponent(tenKhach)}`;
+    document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-            document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+    if (data) {
+      const rows = decodeURIComponent(data).split('_b_');
+      const table = document.getElementById('invoiceTable');
+      let tongGia = 0;
+
+      rows.forEach(record => {
+        const items = record.split('_a_');
+        if (items.length >= 4) {
+          const row = table.insertRow();
+          row.insertCell(0).textContent = items[0];
+          row.insertCell(1).textContent = items[1];
+          const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
+          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
+          row.insertCell(2).textContent = donGia.toLocaleString() + ' VNĐ';
+          row.insertCell(3).textContent = thanhTien.toLocaleString() + ' VNĐ';
+          tongGia += thanhTien;
         }
-    </script>
+      });
+
+      document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+    }
+
+    // Hàm xuất PDF
+    document.getElementById('btnPdf').addEventListener('click', () => {
+      const doc = new jsPDF({
+        unit: 'pt',
+        format: 'a4'
+      });
+
+      doc.html(document.getElementById('invoiceContent'), {
+        callback: function (doc) {
+          doc.save(`HoaDon_${tenKhach}_${ngayBan}.pdf`);
+        },
+        margin: [20, 20, 20, 20],
+        autoPaging: 'text',
+        x: 10,
+        y: 10
+      });
+    });
+  </script>
 </body>
 </html>
- 
+
