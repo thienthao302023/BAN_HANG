@@ -10,10 +10,40 @@
     .header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
     .info { margin-bottom: 20px; }
     .info p { margin: 5px 0; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { padding: 8px; text-align: center; /* Bỏ border ở đây */ }
-    th { background-color: #e0e0e0; }
-    .total { font-weight: bold; text-align: right; margin-top: 10px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 20px; /* Cỡ chữ bảng */
+    }
+    th, td {
+      padding: 8px;
+    }
+    th {
+      background-color: #e0e0e0;
+      font-weight: bold;
+      font-size: 20px; /* Cỡ chữ tiêu đề */
+      text-align: center;
+    }
+
+    /* Độ rộng cột */
+    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
+    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
+    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
+    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
+
+    /* Canh chỉnh dữ liệu trong td */
+    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 10px; }
+    #invoiceTable td:nth-child(2) { text-align: center; }
+    #invoiceTable td:nth-child(3),
+    #invoiceTable td:nth-child(4) { text-align: right; padding-right: 10px; }
+
+    .total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+      font-size: 18px; /* Cỡ chữ tổng giá */
+    }
   </style>
 </head>
 <body>
@@ -26,12 +56,12 @@
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
-        <th>SỐ LƯỢNG</th>
-        <th>ĐƠN GIÁ</th>
-        <th>THÀNH TIỀN</th>
+        <th>SL</th>
+        <th>Đ.GIÁ</th>
+        <th>T.TIỀN</th>
       </tr>
     </table>
-    <div class="total" id="tongGia">Tổng giá: 0 VNĐ</div>
+    <div class="total" id="tongGia">Tổng cộng: 0</div>
   </div>
 
   <script>
@@ -56,8 +86,8 @@
           row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString() + ' VNĐ';
-          row.insertCell(3).textContent = thanhTien.toLocaleString() + ' VNĐ';
+          row.insertCell(2).textContent = donGia.toLocaleString();
+          row.insertCell(3).textContent = thanhTien.toLocaleString();
           tongGia += thanhTien;
         }
       });
