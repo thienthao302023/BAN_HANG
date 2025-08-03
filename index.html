@@ -5,30 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hóa Đơn</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .invoice { width: 80%; margin: 20px auto; padding: 20px; }
-    .header { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-    .info { margin-bottom: 20px; }
-    .info p { margin: 5px 0; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .invoice {
+      width: 80%;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .info {
+      margin-bottom: 20px;
+    }
+    .info p {
+      margin: 5px 0;
+    }
     table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  font-size: 20px; /* Cỡ chữ bảng */
-  border: 1px solid #000; /* ✅ Thêm khung cho bảng */
-}
-th, td {
-  padding: 8px;
-  border: 1px solid #000; /* ✅ Thêm khung cho ô */
-}
-th {
-  background-color: #e0e0e0;
-  font-weight: bold;
-  font-size: 20px;
-  text-align: center;
-}
-
-
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 20px;
+      border: 1px solid #000;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #000;
+    }
+    th {
+      background-color: #e0e0e0;
+      font-weight: bold;
+      font-size: 20px;
+      text-align: center;
+    }
 
     /* Độ rộng cột */
     #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
@@ -37,16 +52,16 @@ th {
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
 
     /* Canh chỉnh dữ liệu trong td */
-#invoiceTable td:nth-child(1) {
-  text-align: left;
-  padding-left: 10px;
-}
-#invoiceTable td:nth-child(2),
-#invoiceTable td:nth-child(3),
-#invoiceTable td:nth-child(4) {
-  text-align: right;
-  padding-right: 10px;
-}
+    #invoiceTable td:nth-child(1) {
+      text-align: left;
+      padding-left: 10px;
+    }
+    #invoiceTable td:nth-child(2),
+    #invoiceTable td:nth-child(3),
+    #invoiceTable td:nth-child(4) {
+      text-align: right;
+      padding-right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -64,7 +79,6 @@ th {
         <th>T.TIỀN</th>
       </tr>
     </table>
-    <div class="total" id="tongGia">Tổng cộng: 0</div>
   </div>
 
   <script>
@@ -95,7 +109,14 @@ th {
         }
       });
 
-      document.getElementById('tongGia').textContent = `Tổng giá: ${tongGia.toLocaleString()} VNĐ`;
+      // Chèn dòng Tổng cộng vào cuối bảng
+      const totalRow = table.insertRow();
+      const cell1 = totalRow.insertCell(0);
+      cell1.colSpan = 4;
+      cell1.style.fontWeight = 'bold';
+      cell1.style.textAlign = 'left';
+      cell1.style.paddingLeft = '10px';
+      cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
     }
   </script>
 </body>
