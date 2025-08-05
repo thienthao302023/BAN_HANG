@@ -19,34 +19,33 @@
     }
     .header {
       text-align: center;
-      font-size: 40px; /* Chú thích: Kích thước chữ cho tiêu đề "HOÁ ĐƠN", có thể thay đổi giá trị này (đơn vị px) để tăng/giảm kích thước */
+      font-size: 40px; /* Chú thích: Kích thước chữ cho tiêu đề "HOÁ ĐƠN" */
       font-weight: bold;
       margin-bottom: 20px;
     }
     .info {
       margin-bottom: 30px;
-      /* Chú thích: Khoảng cách dưới của khu vực thông tin (Khách hàng, Ngày bán) */
+      /* Chú thích: Khoảng cách dưới của khu vực thông tin */
     }
     .info p {
       margin: 5px 0;
-      font-size: 25px; /* Chú thích: Kích thước chữ cho các dòng thông tin, có thể thay đổi giá trị này */
+      font-size: 25px; /* Chú thích: Kích thước chữ cho các dòng thông tin */
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
-      font-size: 25px; /* Chú thích: Kích thước chữ mặc định cho toàn bộ bảng (bao gồm cả nội dung ô), có thể thay đổi giá trị này */
+      font-size: 25px; /* Chú thích: Kích thước chữ mặc định cho bảng */
       border: 1.5px solid #000;
     }
     th, td {
       padding: 8px;
       border: 1px solid #000;
-      /* Chú thích: Định dạng padding và viền cho các ô trong bảng */
     }
     th {
       background-color: #e0e0e0;
       font-weight: bold;
-      font-size: 25px; /* Chú thích: Kích thước chữ cho tiêu đề cột trong bảng (SẢN PHẨM, SL, Đ.GIÁ, T.TIỀN), có thể thay đổi giá trị này */
+      font-size: 25px;
       text-align: center;
     }
 
@@ -56,23 +55,20 @@
     #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
 
-    /* Canh chỉnh dữ liệu trong td */
+    /* Căn chỉnh dữ liệu trong các cột */
     #invoiceTable td:nth-child(1) {
       text-align: left;
       padding-left: 10px;
-      /* Chú thích: Căn trái và padding cho cột SẢN PHẨM */
     }
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
       text-align: right;
       padding-right: 10px;
-      /* Chú thích: Căn phải và padding cho các cột SL, Đ.GIÁ, T.TIỀN */
     }
 
-    /* Chú thích: Để thay đổi kích thước chữ trong bảng cho riêng nội dung ô (td), thêm thuộc tính font-size vào đây */
     #invoiceTable td {
-      font-size: 25px; /* Chú thích: Kích thước chữ cho nội dung các ô trong bảng, có thể thay đổi giá trị này */
+      font-size: 25px;
     }
   </style>
 </head>
@@ -80,12 +76,11 @@
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
     <div class="info">
-      <!-- Chú thích: Các dòng thông tin dưới đây hiển thị Khách hàng, Ngày bán (đã bỏ Mã đơn hàng) -->
-      <p id="tenKhach">KHÁCH HÀNG: [KHÁCH HÀNG]</p>
+      <!-- Đã đổi "KHÁCH HÀNG" thành "Khách hàng" -->
+      <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
     <table id="invoiceTable">
-      <!-- Chú thích: Bảng hiển thị danh sách sản phẩm, số lượng, đơn giá, thành tiền -->
       <tr>
         <th>SẢN PHẨM</th>
         <th>SL</th>
@@ -95,7 +90,7 @@
     </table>
   </div>
 
-  <!-- Thư viện html2pdf.js để tạo file PDF -->
+  <!-- Thư viện html2pdf.js để dùng thủ công nếu cần -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
@@ -105,9 +100,9 @@
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const data = urlParams.get('data') || '';
 
-    // Chú thích: Cập nhật tiêu đề trang từ tham số URL
+    // Cập nhật tiêu đề và thông tin khách hàng
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
-    document.getElementById('tenKhach').textContent = `KHÁCH HÀNG: ${decodeURIComponent(tenKhach)}`;
+    document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
     if (data) {
@@ -115,12 +110,11 @@
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
 
-      // Chú thích: Xử lý dữ liệu sản phẩm từ tham số data, khôi phục dấu phẩy trong tên sản phẩm
       rows.forEach(record => {
         const items = record.split('_a_');
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Khôi phục dấu phẩy
+          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
           row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
@@ -130,7 +124,6 @@
         }
       });
 
-      // Chú thích: Thêm dòng Tổng cộng vào cuối bảng
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
       cell1.colSpan = 4;
@@ -140,18 +133,7 @@
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
     }
 
-    // Chú thích: Tự động tạo và tải PDF khi trang được load
-    window.onload = function () {
-      const element = document.getElementById("invoiceContent");
-      const opt = {
-        margin:       0.5,
-        filename:     `${decodeURIComponent(maDonHang)}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    };
+    // Đã xoá chức năng tự động tạo PDF tại đây
   </script>
 </body>
 </html>
