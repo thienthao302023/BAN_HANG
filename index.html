@@ -99,7 +99,8 @@
         const items = record.split('_a_');
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0];
+          // Khôi phục dấu phẩy từ dấu gạch dưới trong tên sản phẩm
+          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
           row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
