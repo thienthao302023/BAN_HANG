@@ -25,11 +25,11 @@
     }
     .info {
       margin-bottom: 30px;
-      /* Chú thích: Khoảng cách dưới của khu vực thông tin (Mã đơn hàng, Khách hàng, Ngày bán) */
+      /* Chú thích: Khoảng cách dưới của khu vực thông tin (Khách hàng, Ngày bán) */
     }
     .info p {
       margin: 5px 0;
-      font-size: 25px; /* Chú thích: Kích thước chữ cho các dòng thông tin (Mã đơn hàng, Khách hàng, Ngày bán), có thể thay đổi giá trị này */
+      font-size: 25px; /* Chú thích: Kích thước chữ cho các dòng thông tin, có thể thay đổi giá trị này */
     }
     table {
       width: 100%;
@@ -80,7 +80,7 @@
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
     <div class="info">
-      <!-- Chú thích: Các dòng thông tin dưới đây hiển thị Mã đơn hàng, Khách hàng, Ngày bán -->
+      <!-- Chú thích: Các dòng thông tin dưới đây hiển thị Khách hàng, Ngày bán (đã bỏ Mã đơn hàng) -->
       <p id="tenKhach">KHÁCH HÀNG: [KHÁCH HÀNG]</p>
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
@@ -95,6 +95,9 @@
     </table>
   </div>
 
+  <!-- Thư viện html2pdf.js để tạo file PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
@@ -102,9 +105,8 @@
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const data = urlParams.get('data') || '';
 
-    // Chú thích: Cập nhật tiêu đề trang và nội dung hóa đơn từ tham số URL
+    // Chú thích: Cập nhật tiêu đề trang từ tham số URL
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
-    document.getElementById('maDonHang').textContent = `MÃ ĐƠN HÀNG: ${decodeURIComponent(maDonHang)}`;
     document.getElementById('tenKhach').textContent = `KHÁCH HÀNG: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
@@ -137,6 +139,19 @@
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
     }
+
+    // Chú thích: Tự động tạo và tải PDF khi trang được load
+    window.onload = function () {
+      const element = document.getElementById("invoiceContent");
+      const opt = {
+        margin:       0.5,
+        filename:     `${decodeURIComponent(maDonHang)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    };
   </script>
 </body>
 </html>
