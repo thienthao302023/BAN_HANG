@@ -96,12 +96,12 @@
   </div>
 
   <script>
-    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm, nợ cũ
+    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm, số dư trước
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-    const noCu = parseInt(urlParams.get('nocu')?.replace(/,/g, '')) || 0;
+    const soDuTruoc = parseInt(urlParams.get('nocu')?.replace(/,/g, '')) || 0;
     const data = urlParams.get('data') || '';
 
     // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
@@ -147,16 +147,16 @@
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Thêm dòng Nợ cũ dưới dòng Tổng cộng, chiếm hết 4 cột
-      if (noCu > 0) {
-        const noCuRow = table.insertRow();
-        const noCuCell = noCuRow.insertCell(0);
-        // Nợ cũ chiếm hết 4 cột
-        noCuCell.colSpan = 4;
-        noCuCell.style.fontWeight = 'bold';
-        noCuCell.style.textAlign = 'right';
-        noCuCell.style.paddingLeft = '10px';
-        noCuCell.textContent = `Nợ cũ: ${noCu.toLocaleString()} VNĐ`;
+      // Thêm dòng Số dư trước dưới dòng Tổng cộng, chiếm hết 4 cột
+      if (soDuTruoc > 0) {
+        const soDuTruocRow = table.insertRow();
+        const soDuTruocCell = soDuTruocRow.insertCell(0);
+        // Số dư trước chiếm hết 4 cột
+        soDuTruocCell.colSpan = 4;
+        soDuTruocCell.style.fontWeight = 'bold';
+        soDuTruocCell.style.textAlign = 'right';
+        soDuTruocCell.style.paddingLeft = '10px';
+        soDuTruocCell.textContent = `Số dư trước: ${soDuTruoc.toLocaleString()} VNĐ`;
       }
     }
   </script>
