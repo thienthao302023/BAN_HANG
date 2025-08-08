@@ -100,11 +100,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
-    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm
+    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm, nợ cũ
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+    const noCu = parseInt(urlParams.get('nocu')?.replace(/,/g, '')) || 0;
     const data = urlParams.get('data') || '';
 
     // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
@@ -117,7 +118,6 @@
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0; // biến tính tổng tiền sản phẩm
-      let noCu = 0;    // biến lưu nợ cũ, mặc định 0
 
       rows.forEach(record => {
         // Tách trường trong mỗi dòng theo '_a_'
@@ -140,15 +140,10 @@
 
           // Cộng dồn tổng tiền sản phẩm
           tongGia += thanhTien;
-
-          // Nếu có trường thứ 5 (nợ cũ), lấy giá trị này
-          if (items.length >= 5) {
-            noCu = parseInt(items[4].replace(/,/g, '')) || 0;
-          }
         }
       });
 
-      // Thêm dòng Tổng cộng ngay dưới các sản phẩm (không tính nợ cũ)
+      // Thêm dòng Tổng cộng ngay dưới các sản phẩm
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
       // Tổng cộng chiếm hết 4 cột
@@ -159,7 +154,7 @@
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Nếu có nợ cũ, thêm dòng nợ cũ dưới cùng bảng
+      // Thêm dòng Nợ cũ dưới dòng Tổng cộng
       if (noCu > 0) {
         const noCuRow = table.insertRow();
         const noCuCell = noCuRow.insertCell(0);
@@ -177,9 +172,6 @@
         noCuValueCell.textContent = noCu.toLocaleString() + ' VNĐ';
       }
     }
-
-    // Lưu ý: hiện tại không có chức năng tự động tạo PDF,
-    // bạn có thể thêm lại nếu cần bằng html2pdf.js
   </script>
 </body>
 </html>
