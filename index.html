@@ -50,10 +50,11 @@
     }
 
     /* Độ rộng cột */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
+    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 55%; }
     #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
-    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
+    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 13%; }
+    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 15%; }
+    #invoiceTable th:nth-child(5), #invoiceTable td:nth-child(5) { width: 12%; }
 
     /* Căn chỉnh dữ liệu trong các cột */
     #invoiceTable td:nth-child(1) {
@@ -62,7 +63,8 @@
     }
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
-    #invoiceTable td:nth-child(4) {
+    #invoiceTable td:nth-child(4),
+    #invoiceTable td:nth-child(5) {
       text-align: right;
       padding-right: 10px;
     }
@@ -86,6 +88,7 @@
         <th>SL</th>
         <th>Đ.GIÁ</th>
         <th>T.TIỀN</th>
+        <th>NỢ CŨ</th>
       </tr>
     </table>
   </div>
@@ -109,21 +112,26 @@
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
+      let tongNoCu = 0;
 
       rows.forEach(record => {
         const items = record.split('_a_');
-        if (items.length >= 4) {
+        if (items.length >= 5) {
           const row = table.insertRow();
           row.insertCell(0).textContent = items[0].replace(/_/g, ',');
           row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
+          const noCu = parseInt(items[4].replace(/,/g, '')) || 0;
           row.insertCell(2).textContent = donGia.toLocaleString();
           row.insertCell(3).textContent = thanhTien.toLocaleString();
+          row.insertCell(4).textContent = noCu.toLocaleString();
           tongGia += thanhTien;
+          tongNoCu += noCu;
         }
       });
 
+      // Dòng tổng tiền
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
       cell1.colSpan = 4;
@@ -131,6 +139,15 @@
       cell1.style.textAlign = 'right';
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
+
+      // Dòng tổng nợ cũ
+      const totalNoCuRow = table.insertRow();
+      const cellNoCu = totalNoCuRow.insertCell(0);
+      cellNoCu.colSpan = 4;
+      cellNoCu.style.fontWeight = 'bold';
+      cellNoCu.style.textAlign = 'right';
+      cellNoCu.style.paddingLeft = '10px';
+      cellNoCu.textContent = `Tổng nợ cũ: ${tongNoCu.toLocaleString()} VNĐ`;
     }
 
     // Đã xoá chức năng tự động tạo PDF tại đây
