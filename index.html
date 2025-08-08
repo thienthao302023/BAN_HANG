@@ -46,9 +46,8 @@
       padding: 8px;
       border: 1px solid #000;
     }
-    /* Tiêu đề bảng có nền xám nhạt, chữ đậm, size 25, căn giữa */
+    /* Tiêu đề bảng: chữ đậm, size 25, căn giữa, không có màu nền */
     th {
-      background-color: #e0e0e0;
       font-weight: bold;
       font-size: 25px;
       text-align: center;
@@ -96,9 +95,6 @@
     </table>
   </div>
 
-  <!-- Thư viện html2pdf.js, bạn có thể dùng nếu cần tạo PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <script>
     // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm, nợ cũ
     const urlParams = new URLSearchParams(window.location.search);
@@ -129,15 +125,12 @@
           row.insertCell(0).textContent = items[0].replace(/_/g, ',');
           // Cột số lượng
           row.insertCell(1).textContent = items[1];
-
           // Lấy đơn giá, thành tiền, bỏ dấu phẩy để parse số
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-
           // Hiển thị đơn giá và thành tiền dạng có dấu phẩy ngăn cách phần nghìn
           row.insertCell(2).textContent = donGia.toLocaleString();
           row.insertCell(3).textContent = thanhTien.toLocaleString();
-
           // Cộng dồn tổng tiền sản phẩm
           tongGia += thanhTien;
         }
@@ -154,22 +147,16 @@
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Thêm dòng Nợ cũ dưới dòng Tổng cộng
+      // Thêm dòng Nợ cũ dưới dòng Tổng cộng, chiếm hết 4 cột
       if (noCu > 0) {
         const noCuRow = table.insertRow();
         const noCuCell = noCuRow.insertCell(0);
-        // Nợ cũ chiếm 3 cột đầu
-        noCuCell.colSpan = 3;
+        // Nợ cũ chiếm hết 4 cột
+        noCuCell.colSpan = 4;
         noCuCell.style.fontWeight = 'bold';
         noCuCell.style.textAlign = 'right';
-        noCuCell.style.paddingRight = '10px';
-        noCuCell.textContent = 'Nợ cũ:';
-
-        // Cột giá trị nợ cũ căn phải, chữ đậm
-        const noCuValueCell = noCuRow.insertCell(1);
-        noCuValueCell.style.fontWeight = 'bold';
-        noCuValueCell.style.textAlign = 'right';
-        noCuValueCell.textContent = noCu.toLocaleString() + ' VNĐ';
+        noCuCell.style.paddingLeft = '10px';
+        noCuCell.textContent = `Nợ cũ: ${noCu.toLocaleString()} VNĐ`;
       }
     }
   </script>
