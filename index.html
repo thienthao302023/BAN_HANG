@@ -5,40 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    /* Đặt font chữ, margin, padding cho toàn trang */
+    /* Toàn bộ trang dùng font Arial, không có margin và padding mặc định */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
-
-    /* Khung chính hóa đơn, căn giữa trang, rộng 80% */
+    /* Khu vực hóa đơn: rộng 80%, căn giữa, padding 20px */
     .invoice {
       width: 80%;
       margin: 20px auto;
       padding: 20px;
     }
-
-    /* Tiêu đề lớn "HOÁ ĐƠN" */
+    /* Tiêu đề "HOÁ ĐƠN": căn giữa, chữ to, đậm */
     .header {
       text-align: center;
       font-size: 40px;
       font-weight: bold;
       margin-bottom: 20px;
     }
-
-    /* Khu vực thông tin khách hàng và ngày bán */
+    /* Phần thông tin khách hàng và ngày bán */
     .info {
       margin-bottom: 30px;
     }
-
-    /* Kích cỡ chữ cho các dòng thông tin */
+    /* Các đoạn thông tin trong phần info có khoảng cách 5px trên dưới và chữ size 25 */
     .info p {
       margin: 5px 0;
       font-size: 25px;
     }
-
-    /* Bảng sản phẩm: full chiều rộng, không cách dòng, font to, viền đậm */
+    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 25, viền 1.5px đen */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -46,40 +41,36 @@
       font-size: 25px;
       border: 1.5px solid #000;
     }
-
-    /* Định dạng chung cho ô trong bảng */
+    /* Các ô trong bảng có padding 8px và viền 1px đen */
     th, td {
       padding: 8px;
       border: 1px solid #000;
     }
-
-    /* Header bảng nền xám nhạt, chữ đậm và căn giữa */
+    /* Tiêu đề bảng có nền xám nhạt, chữ đậm, size 25, căn giữa */
     th {
       background-color: #e0e0e0;
       font-weight: bold;
       font-size: 25px;
       text-align: center;
     }
-
-    /* Đặt độ rộng từng cột */
+    /* Độ rộng từng cột trong bảng */
     #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
     #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
     #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
-
-    /* Căn trái cho cột 1, căn phải cho cột 2,3,4 */
+    /* Căn trái cho cột sản phẩm, có padding trái 10px */
     #invoiceTable td:nth-child(1) {
       text-align: left;
       padding-left: 10px;
     }
+    /* Các cột SL, Đ.GIÁ, T.TIỀN căn phải, padding phải 10px */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
       text-align: right;
       padding-right: 10px;
     }
-
-    /* Font size trong ô */
+    /* Toàn bộ ô trong bảng có chữ size 25 */
     #invoiceTable td {
       font-size: 25px;
     }
@@ -87,16 +78,14 @@
 </head>
 <body>
   <div class="invoice" id="invoiceContent">
-    <!-- Tiêu đề hóa đơn -->
     <div class="header">HOÁ ĐƠN</div>
-
-    <!-- Thông tin khách hàng và ngày bán -->
     <div class="info">
+      <!-- Hiển thị tên khách hàng -->
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
+      <!-- Hiển thị ngày bán -->
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
-
-    <!-- Bảng danh sách sản phẩm -->
+    <!-- Bảng chứa các sản phẩm -->
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
@@ -107,88 +96,90 @@
     </table>
   </div>
 
-  <!-- Thư viện html2pdf.js (nếu bạn muốn tạo PDF từ trang này) -->
+  <!-- Thư viện html2pdf.js, bạn có thể dùng nếu cần tạo PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
-    // Lấy tham số trên URL
+    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm
     const urlParams = new URLSearchParams(window.location.search);
-
-    // Lấy mã đơn hàng, tên khách, ngày bán hoặc đặt mặc định nếu không có
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-
-    // Dữ liệu sản phẩm, mỗi dòng gồm 5 phần: Sản phẩm, SL, Đơn giá, Thành tiền, Nợ cũ
     const data = urlParams.get('data') || '';
 
-    // Cập nhật tiêu đề trang và thông tin khách hàng
+    // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
     document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
     if (data) {
-      // Tách các dòng sản phẩm theo phân cách '_b_'
+      // Tách các dòng sản phẩm theo '_b_'
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
+      let tongGia = 0; // biến tính tổng tiền sản phẩm
+      let noCu = 0;    // biến lưu nợ cũ, mặc định 0
 
-      // Biến lưu tổng tiền và tổng nợ cũ
-      let tongGia = 0;
-      let tongNoCu = 0;
-
-      // Duyệt từng dòng sản phẩm
       rows.forEach(record => {
-        // Tách các phần trong dòng theo phân cách '_a_'
+        // Tách trường trong mỗi dòng theo '_a_'
         const items = record.split('_a_');
-
-        if (items.length >= 4) {  // Cần ít nhất 4 phần để hiển thị bảng
-          // Thêm dòng mới vào bảng
+        if (items.length >= 4) {
+          // Thêm dòng mới vào bảng cho sản phẩm
           const row = table.insertRow();
-
-          // Cột SẢN PHẨM: thay dấu gạch dưới '_' thành dấu phẩy ','
+          // Cột sản phẩm: thay dấu _ thành dấu phẩy (,) cho đẹp
           row.insertCell(0).textContent = items[0].replace(/_/g, ',');
-
-          // Cột SỐ LƯỢNG
+          // Cột số lượng
           row.insertCell(1).textContent = items[1];
 
-          // Cột ĐƠN GIÁ - chuyển sang số rồi format với dấu phẩy
+          // Lấy đơn giá, thành tiền, bỏ dấu phẩy để parse số
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString();
-
-          // Cột THÀNH TIỀN - chuyển sang số rồi format với dấu phẩy
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
+
+          // Hiển thị đơn giá và thành tiền dạng có dấu phẩy ngăn cách phần nghìn
+          row.insertCell(2).textContent = donGia.toLocaleString();
           row.insertCell(3).textContent = thanhTien.toLocaleString();
 
-          // Cộng dồn tổng tiền
+          // Cộng dồn tổng tiền sản phẩm
           tongGia += thanhTien;
 
-          // Lấy nợ cũ (phần tử thứ 5 nếu có), chuyển sang số, nếu không có lấy 0
-          const noCu = parseInt(items[4]?.replace(/,/g, '') || '0') || 0;
-          tongNoCu += noCu;
+          // Nếu có trường thứ 5 (nợ cũ), lấy giá trị này
+          if (items.length >= 5) {
+            noCu = parseInt(items[4].replace(/,/g, '')) || 0;
+          }
         }
       });
 
-      // Thêm dòng tổng cộng vào bảng
+      // Thêm dòng Tổng cộng ngay dưới các sản phẩm (không tính nợ cũ)
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
-
-      // Gộp 4 cột làm 1 để hiển thị dòng tổng cộng
+      // Tổng cộng chiếm hết 4 cột
       cell1.colSpan = 4;
+      // Định dạng chữ đậm, căn phải và padding trái 10px cho đẹp
       cell1.style.fontWeight = 'bold';
       cell1.style.textAlign = 'right';
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Thêm dòng hiển thị Nợ cũ bên dưới bảng, căn lề phải
-      const invoiceDiv = document.getElementById('invoiceContent');
-      const noCuDiv = document.createElement('div');
-      noCuDiv.style.fontSize = '25px';
-      noCuDiv.style.fontWeight = 'bold';
-      noCuDiv.style.textAlign = 'right';
-      noCuDiv.style.marginRight = '10%';  // Căn lề ngang giống bảng
-      noCuDiv.textContent = `Nợ cũ: ${tongNoCu.toLocaleString()} VNĐ`;
-      invoiceDiv.appendChild(noCuDiv);
+      // Nếu có nợ cũ, thêm dòng nợ cũ dưới cùng bảng
+      if (noCu > 0) {
+        const noCuRow = table.insertRow();
+        const noCuCell = noCuRow.insertCell(0);
+        // Nợ cũ chiếm 3 cột đầu
+        noCuCell.colSpan = 3;
+        noCuCell.style.fontWeight = 'bold';
+        noCuCell.style.textAlign = 'right';
+        noCuCell.style.paddingRight = '10px';
+        noCuCell.textContent = 'Nợ cũ:';
+
+        // Cột giá trị nợ cũ căn phải, chữ đậm
+        const noCuValueCell = noCuRow.insertCell(1);
+        noCuValueCell.style.fontWeight = 'bold';
+        noCuValueCell.style.textAlign = 'right';
+        noCuValueCell.textContent = noCu.toLocaleString() + ' VNĐ';
+      }
     }
+
+    // Lưu ý: hiện tại không có chức năng tự động tạo PDF,
+    // bạn có thể thêm lại nếu cần bằng html2pdf.js
   </script>
 </body>
 </html>
