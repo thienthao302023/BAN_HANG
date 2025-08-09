@@ -100,7 +100,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]'; // Mã đơn hàng
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; // Tên khách hàng
-    const noCu = urlParams.get('nocu') || '0'; // Nợ cũ, mặc định là 0 nếu không có
+    const donCuCon = urlParams.get('doncucon') || '0'; // Đơn cũ còn, mặc định là 0 nếu không có
     const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng, mặc định là 0 nếu không có
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán
     const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm
@@ -140,17 +140,17 @@
       cell1.style.paddingLeft = '10px';
       cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Kiểm tra nếu nợ cũ khác 0 và không rỗng thì hiển thị hai dòng "Nợ cũ" và "Tổng cộng"
-      const noCuValue = parseInt(decodeURIComponent(noCu)) || 0;
-      if (noCuValue !== 0 && noCu !== '') {
-        // Thêm dòng Nợ cũ
-        const noCuRow = table.insertRow();
-        const cell2 = noCuRow.insertCell(0);
+      // Kiểm tra nếu đơn cũ còn khác 0 và không rỗng thì hiển thị hai dòng "Đơn cũ còn" và "Tổng cộng"
+      const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
+      if (donCuConValue !== 0 && donCuCon !== '') {
+        // Thêm dòng Đơn cũ còn
+        const donCuConRow = table.insertRow();
+        const cell2 = donCuConRow.insertCell(0);
         cell2.colSpan = 4;
         cell2.style.fontWeight = 'bold';
         cell2.style.textAlign = 'right';
         cell2.style.paddingLeft = '10px';
-        cell2.textContent = `Nợ cũ: ${noCuValue.toLocaleString()} VNĐ`;
+        cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
         // Thêm dòng Tổng cộng
         const tongCongRow = table.insertRow();
