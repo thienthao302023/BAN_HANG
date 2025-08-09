@@ -96,12 +96,14 @@
   </div>
 
   <script>
-    // Lấy các tham số từ URL: mã đơn hàng, khách hàng, ngày bán, dữ liệu sản phẩm
+    // Lấy các tham số từ URL
     const urlParams = new URLSearchParams(window.location.search);
-    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
-    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
-    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-    const data = urlParams.get('data') || '';
+    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]'; // Mã đơn hàng
+    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; // Tên khách hàng
+    const noCu = urlParams.get('nocu') || '0'; // Nợ cũ, mặc định là 0 nếu không có
+    const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng, mặc định là 0 nếu không có
+    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán
+    const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm
 
     // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
@@ -112,39 +114,53 @@
       // Tách các dòng sản phẩm theo '_b_'
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
-      let tongGia = 0; // biến tính tổng tiền sản phẩm
+      let tongGia = 0; // Biến tính tổng tiền sản phẩm
 
+      // Thêm các dòng sản phẩm vào bảng
       rows.forEach(record => {
-        // Tách trường trong mỗi dòng theo '_a_'
         const items = record.split('_a_');
         if (items.length >= 4) {
-          // Thêm dòng mới vào bảng cho sản phẩm
           const row = table.insertRow();
-          // Cột sản phẩm: thay dấu _ thành dấu phẩy (,) cho đẹp
-          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
-          // Cột số lượng
-          row.insertCell(1).textContent = items[1];
-          // Lấy đơn giá, thành tiền, bỏ dấu phẩy để parse số
-          const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
-          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          // Hiển thị đơn giá và thành tiền dạng có dấu phẩy ngăn cách phần nghìn
-          row.insertCell(2).textContent = donGia.toLocaleString();
-          row.insertCell(3).textContent = thanhTien.toLocaleString();
-          // Cộng dồn tổng tiền sản phẩm
-          tongGia += thanhTien;
+          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Cột sản phẩm: thay dấu _ thành dấu phẩy
+          row.insertCell(1).textContent = items[1]; // Cột số lượng
+          const donGia = parseInt(items[2].replace(/,/g, '')) || 0; // Lấy đơn giá, bỏ dấu phẩy
+          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0; // Lấy thành tiền, bỏ dấu phẩy
+          row.insertCell(2).textContent = donGia.toLocaleString(); // Hiển thị đơn giá với dấu phẩy
+          row.insertCell(3).textContent = thanhTien.toLocaleString(); // Hiển thị thành tiền với dấu phẩy
+          tongGia += thanhTien; // Cộng dồn tổng tiền sản phẩm
         }
       });
 
-      // Thêm dòng Tổng cộng ngay dưới các sản phẩm
+      // Thêm dòng Tổng tiền hàng
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
-      // Tổng cộng chiếm hết 4 cột
-      cell1.colSpan = 4;
-      // Định dạng chữ đậm, căn phải và padding trái 10px cho đẹp
+      cell1.colSpan = 4; // Chiếm hết 4 cột
       cell1.style.fontWeight = 'bold';
       cell1.style.textAlign = 'right';
       cell1.style.paddingLeft = '10px';
-      cell1.textContent = `Tổng cộng: ${tongGia.toLocaleString()} VNĐ`;
+      cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
+
+      // Kiểm tra nếu nợ cũ khác 0 và không rỗng thì hiển thị hai dòng "Nợ cũ" và "Tổng cộng"
+      const noCuValue = parseInt(decodeURIComponent(noCu)) || 0;
+      if (noCuValue !== 0 && noCu !== '') {
+        // Thêm dòng Nợ cũ
+        const noCuRow = table.insertRow();
+        const cell2 = noCuRow.insertCell(0);
+        cell2.colSpan = 4;
+        cell2.style.fontWeight = 'bold';
+        cell2.style.textAlign = 'right';
+        cell2.style.paddingLeft = '10px';
+        cell2.textContent = `Nợ cũ: ${noCuValue.toLocaleString()} VNĐ`;
+
+        // Thêm dòng Tổng cộng
+        const tongCongRow = table.insertRow();
+        const cell3 = tongCongRow.insertCell(0);
+        cell3.colSpan = 4;
+        cell3.style.fontWeight = 'bold';
+        cell3.style.textAlign = 'right';
+        cell3.style.paddingLeft = '10px';
+        cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
+      }
     }
   </script>
 </body>
