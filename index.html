@@ -35,20 +35,18 @@
       font-size: 12px;
       line-height: 1.2;
     }
-    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 1.5px đen */
+    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 1px đen */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 5px;
       font-size: 12px;
-      border: 1.5px solid #000; /* Tăng lên 1.5px như mã gốc */
-      border-style: solid;
+      border: 1px solid #000; /* Tăng viền để hiển thị rõ trên iPhone */
     }
-    /* Các ô trong bảng có padding 3px và viền 1.5px đen */
+    /* Các ô trong bảng có padding 3px và viền 1px đen */
     th, td {
       padding: 3px;
-      border: 1.5px solid #000; /* Tăng lên 1.5px như mã gốc */
-      border-style: solid;
+      border: 1px solid #000; /* Tăng viền để hiển thị rõ trên iPhone */
       box-sizing: border-box;
     }
     /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
@@ -97,8 +95,7 @@
       table, th, td {
         font-size: 10px;
         padding: 2px;
-        border: 1.5px solid #000; /* Giữ viền 1.5px khi in */
-        border-style: solid;
+        border: 1px solid #000; /* Đảm bảo viền rõ ràng khi in */
       }
     }
   </style>
@@ -127,8 +124,8 @@
     // Lấy các tham số từ URL
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]'; // Mã đơn hàng
-    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; Hypothetical Response: '; // Tên khách hàng
-    const donCuCon = urlParams.get('doncucon') || '0'; // Đơn cũ embarazo, mặc định là 0 nếu không có
+    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; // Tên khách hàng
+    const donCuCon = urlParams.get('doncucon') || '0'; // Đơn cũ còn, mặc định là 0 nếu không có
     const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng, mặc định là 0 nếu không có
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán
     const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm
