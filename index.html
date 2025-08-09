@@ -10,6 +10,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
     /* Khu vực hóa đơn: rộng 80mm, căn giữa, padding 5px */
     .invoice {
@@ -20,7 +21,7 @@
     /* Tiêu đề "HOÁ ĐƠN": căn giữa, chữ to, đậm */
     .header {
       text-align: center;
-      font-size: 20px; /* Giảm từ 40px để phù hợp K80 */
+      font-size: 20px;
       font-weight: bold;
       margin-bottom: 5px;
     }
@@ -31,32 +32,33 @@
     /* Các đoạn thông tin trong phần info có khoảng cách 2px trên dưới và chữ size 12 */
     .info p {
       margin: 2px 0;
-      font-size: 12px; /* Phù hợp cho K80 */
+      font-size: 12px;
       line-height: 1.2;
     }
-    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 0.5px đen */
+    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 1px đen */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 5px;
-      font-size: 12px; /* Phù hợp cho K80 */
-      border: 0.5px solid #000;
+      font-size: 12px;
+      border: 1px solid #000; /* Tăng từ 0.5px để hiển thị rõ trên iPhone */
     }
-    /* Các ô trong bảng có padding 3px và viền 0.5px đen */
+    /* Các ô trong bảng có padding 3px và viền 1px đen */
     th, td {
       padding: 3px;
-      border: 0.5px solid #000;
+      border: 1px solid #000; /* Tăng từ 0.5px để hiển thị rõ trên iPhone */
+      box-sizing: border-box;
     }
     /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
     th {
       font-weight: bold;
-      font-size: 12px; /* Phù hợp cho K80 */
+      font-size: 12px;
       text-align: center;
     }
     /* Độ rộng từng cột trong bảng, tối ưu cho K80 */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 50%; } /* Giảm từ 60% */
-    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 10%; } /* Tăng từ 5% */
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 20%; } /* Tăng từ 15% */
+    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 50%; }
+    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 10%; }
+    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 20%; }
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
     /* Căn trái cho cột sản phẩm, padding trái 5px */
     #invoiceTable td:nth-child(1) {
@@ -72,7 +74,7 @@
     }
     /* Toàn bộ ô trong bảng có chữ size 12 */
     #invoiceTable td {
-      font-size: 12px; /* Phù hợp cho K80 */
+      font-size: 12px;
     }
     /* Tối ưu cho in ấn trên khổ K80 */
     @media print {
@@ -93,7 +95,13 @@
       table, th, td {
         font-size: 10px;
         padding: 2px;
-        border: 0.5px solid #000;
+        border: 1px solid #000; /* Đảm bảo viền rõ ràng khi in */
+      }
+    }
+    /* Đảm bảo tương thích với Safari */
+    @supports (-webkit-touch-callout: none) {
+      table, th, td {
+        border: 1px solid #000 !important; /* Ép buộc hiển thị viền trên Safari */
       }
     }
   </style>
