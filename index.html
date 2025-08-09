@@ -43,25 +43,25 @@
 
     /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 1px đen */
     table {
-      width: 100%;
-      border-collapse: collapse; /* Gộp viền */
-      border-spacing: 0; /* Loại bỏ khoảng cách giữa các ô */
-      margin-bottom: 5px;
-      font-size: 12px;
-      border: 1px solid #000; /* Viền ngoài bảng */
-      border-style: solid;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased; /* Tăng độ nét chữ trên Safari */
-    }
+  width: 100%;
+  border-collapse: collapse !important;
+  /* Xóa border-spacing */
+  margin-bottom: 5px;
+  font-size: 12px;
+  border: 1px solid #000; /* Viền ngoài bảng */
+  box-sizing: border-box;
+  background-color: #fff;
+}
 
-    /* Các ô trong bảng có padding nhỏ, viền 1px đen */
-    th, td {
-      padding: 2px 4px; /* Padding nhỏ hơn để tránh viền bị gãy trên iPhone */
-      border: 1px solid #000; /* Viền ô */
-      border-style: solid;
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-    }
+th, td {
+  border: 0.5px solid #000; /* Viền các ô */
+  padding: 2px 4px;
+  box-sizing: border-box;
+  line-height: 1.2;
+  vertical-align: top;
+}
+
+
 
     /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
     th {
