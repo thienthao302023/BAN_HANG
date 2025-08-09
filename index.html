@@ -6,22 +6,22 @@
   <meta name="viewport" content="width=80mm, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    /* Toàn bộ trang dùng font Arial, không có margin và padding mặc định */
+    /* ======== CSS CHUNG ======== */
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial, sans-serif; /* Font dễ đọc */
       margin: 0;
       padding: 0;
-      box-sizing: border-box; /* Tính padding và border vào kích thước */
+      box-sizing: border-box; /* Tính cả padding và border vào width/height */
     }
 
-    /* Khu vực hóa đơn: rộng 80mm, căn giữa, padding 5px */
+    /* Khu vực hóa đơn */
     .invoice {
-      width: 80mm; /* Phù hợp khổ K80 */
+      width: 80mm; /* Chuẩn khổ K80 */
       margin: 0 auto;
       padding: 5px;
     }
 
-    /* Tiêu đề "HOÁ ĐƠN": căn giữa, chữ to, đậm */
+    /* Tiêu đề */
     .header {
       text-align: center;
       font-size: 20px;
@@ -29,60 +29,56 @@
       margin-bottom: 5px;
     }
 
-    /* Phần thông tin khách hàng và ngày bán */
+    /* Thông tin khách hàng và ngày bán */
     .info {
       margin-bottom: 5px;
     }
 
-    /* Các đoạn thông tin trong phần info có khoảng cách 2px trên dưới và chữ size 12 */
     .info p {
       margin: 2px 0;
       font-size: 12px;
       line-height: 1.2;
     }
 
-    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 1px đen */
+    /* ======== BẢNG SẢN PHẨM ======== */
     table {
-  width: 100%;
-  border-collapse: collapse !important;
-  /* Xóa border-spacing */
-  margin-bottom: 5px;
-  font-size: 12px;
-  border: 2px solid #000; /* Viền ngoài bảng */
-  box-sizing: border-box;
-  background-color: #fff;
-}
+      width: 100%;
+      border-collapse: collapse !important; /* Gộp viền */
+      margin-bottom: 5px;
+      font-size: 12px;
+      border: 2px solid #000; /* Viền ngoài */
+      box-sizing: border-box;
+      background-color: #fff;
+    }
 
-th, td {
-  border: 1px solid #000; /* Viền các ô */
-  padding: 2px 4px;
-  box-sizing: border-box;
-  line-height: 1.2;
-  vertical-align: middle;
-}
+    th, td {
+      border: 1px solid #000; /* Viền ô */
+      padding: 2px 4px;
+      box-sizing: border-box;
+      line-height: 1.2;
+      vertical-align: middle; /* Căn giữa theo chiều dọc */
+    }
 
-
-
-    /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
+    /* Tiêu đề cột */
     th {
       font-weight: bold;
       font-size: 12px;
       text-align: center;
     }
 
-    /* Độ rộng từng cột trong bảng, tối ưu cho K80 */
+    /* Độ rộng từng cột */
     #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 50%; }
     #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 10%; }
     #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 20%; }
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
 
-    /* Căn trái cho cột sản phẩm, padding trái 5px */
+    /* Cột sản phẩm căn trái */
     #invoiceTable td:nth-child(1) {
       text-align: left;
       padding-left: 5px;
     }
 
-    /* Các cột SL, Đ.GIÁ, T.TIỀN căn phải, padding phải 5px */
+    /* Cột SL, Đ.GIÁ, T.TIỀN căn phải */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
@@ -90,12 +86,12 @@ th, td {
       padding-right: 5px;
     }
 
-    /* Toàn bộ ô trong bảng có chữ size 12 */
+    /* Chữ size 12 cho toàn bộ bảng */
     #invoiceTable td {
       font-size: 12px;
     }
 
-    /* Thông báo khi không có sản phẩm */
+    /* Khi không có dữ liệu */
     .no-data {
       text-align: center;
       font-size: 12px;
@@ -103,7 +99,7 @@ th, td {
       margin: 5px 0;
     }
 
-    /* Tối ưu cho in ấn trên khổ K80 */
+    /* ======== CHẾ ĐỘ IN ======== */
     @media print {
       body, .invoice {
         width: 80mm;
@@ -135,12 +131,11 @@ th, td {
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
     <div class="info">
-      <!-- Hiển thị tên khách hàng -->
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
-      <!-- Hiển thị ngày bán -->
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
-    <!-- Bảng chứa các sản phẩm -->
+
+    <!-- Bảng sản phẩm -->
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
@@ -153,10 +148,8 @@ th, td {
   </div>
 
   <script>
-    // Lấy các tham số từ URL
+    // ======== LẤY DỮ LIỆU TỪ URL ========
     const urlParams = new URLSearchParams(window.location.search);
-
-    // Lấy mã đơn hàng, tên khách, đơn cũ còn, tổng cộng, ngày bán, dữ liệu sản phẩm
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const donCuCon = urlParams.get('doncucon') || '0';
@@ -164,46 +157,34 @@ th, td {
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const data = urlParams.get('data') || '';
 
-    // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
+    // Gán vào HTML
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
     document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-    // Xử lý dữ liệu sản phẩm
+    // ======== XỬ LÝ SẢN PHẨM ========
     const table = document.getElementById('invoiceTable');
     const noDataMessage = document.getElementById('noDataMessage');
     let tongGia = 0;
 
     if (data) {
       try {
-        // Tách các dòng sản phẩm theo '_b_' (dấu phân cách dòng)
-        const rows = decodeURIComponent(data).split('_b_');
-
+        const rows = decodeURIComponent(data).split('_b_'); // mỗi sản phẩm cách nhau _b_
         if (rows.length > 0 && rows[0] !== '') {
-          // Với mỗi dòng sản phẩm
           rows.forEach(record => {
-            // Tách từng trường theo '_a_' (dấu phân cách cột)
-            const items = record.split('_a_');
+            const items = record.split('_a_'); // từng trường cách nhau _a_
             if (items.length >= 4) {
-              // Thêm một hàng mới vào bảng
               const row = table.insertRow();
-              // Cột 1: Tên sản phẩm (thay _ thành , nếu có)
-              row.insertCell(0).textContent = items[0].replace(/_/g, ',');
-              // Cột 2: Số lượng
-              row.insertCell(1).textContent = items[1];
-              // Cột 3: Đơn giá - chuyển về số nguyên rồi định dạng lại với dấu phẩy hàng nghìn
+              row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Tên sp
+              row.insertCell(1).textContent = items[1]; // SL
               const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
-              // Cột 4: Thành tiền - tương tự đơn giá
               const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-              row.insertCell(2).textContent = donGia.toLocaleString();
-              row.insertCell(3).textContent = thanhTien.toLocaleString();
-
-              // Cộng tổng tiền hàng
+              row.insertCell(2).textContent = donGia.toLocaleString(); // Đơn giá
+              row.insertCell(3).textContent = thanhTien.toLocaleString(); // Thành tiền
               tongGia += thanhTien;
             }
           });
         } else {
-          // Nếu không có sản phẩm nào
           noDataMessage.style.display = 'block';
         }
       } catch (error) {
@@ -214,19 +195,18 @@ th, td {
       noDataMessage.style.display = 'block';
     }
 
-    // Thêm dòng Tổng tiền hàng ở cuối bảng
+    // ======== THÊM DÒNG TỔNG ========
     const totalRow = table.insertRow();
     const cell1 = totalRow.insertCell(0);
-    cell1.colSpan = 4; // Gộp 4 cột
+    cell1.colSpan = 4;
     cell1.style.fontWeight = 'bold';
     cell1.style.textAlign = 'right';
     cell1.style.paddingLeft = '5px';
     cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
 
-    // Nếu có đơn cũ còn nợ và tổng cộng thì hiển thị thêm 2 dòng
+    // Nếu có đơn cũ còn nợ và tổng cộng
     const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
     if (donCuConValue !== 0 && donCuCon !== '') {
-      // Dòng đơn cũ còn
       const donCuConRow = table.insertRow();
       const cell2 = donCuConRow.insertCell(0);
       cell2.colSpan = 4;
@@ -235,7 +215,6 @@ th, td {
       cell2.style.paddingLeft = '5px';
       cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
-      // Dòng tổng cộng
       const tongCongRow = table.insertRow();
       const cell3 = tongCongRow.insertCell(0);
       cell3.colSpan = 4;
