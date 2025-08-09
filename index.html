@@ -41,12 +41,14 @@
       border-collapse: collapse;
       margin-bottom: 5px;
       font-size: 12px;
-      border: 1px solid #000; /* Viền 1px cho bảng */
+      border: 1px solid #000;
+      border-style: solid; /* Đảm bảo viền hiển thị trên Safari */
     }
     /* Các ô trong bảng có padding 3px và viền 1px đen */
     th, td {
       padding: 3px;
-      border: 1px solid #000; /* Viền 1px cho ô */
+      border: 1px solid #000;
+      border-style: solid; /* Đảm bảo viền hiển thị trên Safari */
       box-sizing: border-box;
     }
     /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
@@ -95,7 +97,8 @@
       table, th, td {
         font-size: 10px;
         padding: 2px;
-        border: 1px solid #000; /* Viền 1px khi in */
+        border: 1px solid #000;
+        border-style: solid; /* Đảm bảo viền hiển thị khi in */
       }
     }
   </style>
@@ -169,7 +172,7 @@
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       if (donCuConValue !== 0 && donCuCon !== '') {
         // Thêm dòng Đơn cũ còn
-        const donCu\"conRow = table.insertRow();
+        const donCuConRow = table.insertRow();
         const cell2 = donCuConRow.insertCell(0);
         cell2.colSpan = 4;
         cell2.style.fontWeight = 'bold';
