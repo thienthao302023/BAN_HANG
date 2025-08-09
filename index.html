@@ -42,13 +42,13 @@
       margin-bottom: 5px;
       font-size: 12px;
       border: 1px solid #000;
-      border-style: solid; /* Đảm bảo viền hiển thị trên Safari */
+      border-style: solid;
     }
     /* Các ô trong bảng có padding 3px và viền 1px đen */
     th, td {
       padding: 3px;
       border: 1px solid #000;
-      border-style: solid; /* Đảm bảo viền hiển thị trên Safari */
+      border-style: solid;
       box-sizing: border-box;
     }
     /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
@@ -78,6 +78,13 @@
     #invoiceTable td {
       font-size: 12px;
     }
+    /* Thông báo khi không có sản phẩm */
+    .no-data {
+      text-align: center;
+      font-size: 12px;
+      color: red;
+      margin: 5px 0;
+    }
     /* Tối ưu cho in ấn trên khổ K80 */
     @media print {
       body, .invoice {
@@ -98,7 +105,10 @@
         font-size: 10px;
         padding: 2px;
         border: 1px solid #000;
-        border-style: solid; /* Đảm bảo viền hiển thị khi in */
+        border-style: solid;
+      }
+      .no-data {
+        font-size: 10px;
       }
     }
   </style>
@@ -121,74 +131,85 @@
         <th>T.TIỀN</th>
       </tr>
     </table>
+    <div id="noDataMessage" class="no-data" style="display: none;">Không có sản phẩm nào được cung cấp.</div>
   </div>
 
   <script>
     // Lấy các tham số từ URL
     const urlParams = new URLSearchParams(window.location.search);
-    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]'; // Mã đơn hàng
-    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; // Tên khách hàng
-    const donCuCon = urlParams.get('doncucon') || '0'; // Đơn cũ còn, mặc định là 0 nếu không có
-    const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng, mặc định là 0 nếu không có
-    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán
-    const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm
+    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
+    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
+    const donCuCon = urlParams.get('doncucon') || '0';
+    const tongCong = urlParams.get('tongcong') || '0';
+    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+    const data = urlParams.get('data') || '';
 
     // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
     document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
+    // Xử lý dữ liệu sản phẩm
+    const table = document.getElementById('invoiceTable');
+    const noDataMessage = document.getElementById('noDataMessage');
+    let tongGia = 0;
+
     if (data) {
-      // Tách các dòng sản phẩm theo '_b_'
-      const rows = decodeURIComponent(data).split('_b_');
-      const table = document.getElementById('invoiceTable');
-      let tongGia = 0; // Biến tính tổng tiền sản phẩm
-
-      // Thêm các dòng sản phẩm vào bảng
-      rows.forEach(record => {
-        const items = record.split('_a_');
-        if (items.length >= 4) {
-          const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Cột sản phẩm: thay dấu _ thành dấu phẩy
-          row.insertCell(1).textContent = items[1]; // Cột số lượng
-          const donGia = parseInt(items[2].replace(/,/g, '')) || 0; // Lấy đơn giá, bỏ dấu phẩy
-          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0; // Lấy thành tiền, bỏ dấu phẩy
-          row.insertCell(2).textContent = donGia.toLocaleString(); // Hiển thị đơn giá với dấu phẩy
-          row.insertCell(3).textContent = thanhTien.toLocaleString(); // Hiển thị thành tiền với dấu phẩy
-          tongGia += thanhTien; // Cộng dồn tổng tiền sản phẩm
+      try {
+        // Tách các dòng sản phẩm theo '_b_'
+        const rows = decodeURIComponent(data).split('_b_');
+        if (rows.length > 0 && rows[0] !== '') {
+          rows.forEach(record => {
+            const items = record.split('_a_');
+            if (items.length >= 4) {
+              const row = table.insertRow();
+              row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Sản phẩm
+              row.insertCell(1).textContent = items[1]; // Số lượng
+              const donGia = parseInt(items[2].replace(/,/g, '')) || 0; // Đơn giá
+              const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0; // Thành tiền
+              row.insertCell(2).textContent = donGia.toLocaleString(); // Hiển thị đơn giá
+              row.insertCell(3).textContent = thanhTien.toLocaleString(); // Hiển thị thành tiền
+              tongGia += thanhTien;
+            }
+          });
+        } else {
+          noDataMessage.style.display = 'block'; // Hiển thị thông báo nếu không có dữ liệu
         }
-      });
-
-      // Thêm dòng Tổng tiền hàng
-      const totalRow = table.insertRow();
-      const cell1 = totalRow.insertCell(0);
-      cell1.colSpan = 4; // Chiếm hết 4 cột
-      cell1.style.fontWeight = 'bold';
-      cell1.style.textAlign = 'right';
-      cell1.style.paddingLeft = '5px';
-      cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
-
-      // Kiểm tra nếu đơn cũ còn khác 0 và không rỗng thì hiển thị hai dòng "Đơn cũ còn" và "Tổng cộng"
-      const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
-      if (donCuConValue !== 0 && donCuCon !== '') {
-        // Thêm dòng Đơn cũ còn
-        const donCuConRow = table.insertRow();
-        const cell2 = donCuConRow.insertCell(0);
-        cell2.colSpan = 4;
-        cell2.style.fontWeight = 'bold';
-        cell2.style.textAlign = 'right';
-        cell2.style.paddingLeft = '5px';
-        cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
-
-        // Thêm dòng Tổng cộng
-        const tongCongRow = table.insertRow();
-        const cell3 = tongCongRow.insertCell(0);
-        cell3.colSpan = 4;
-        cell3.style.fontWeight = 'bold';
-        cell3.style.textAlign = 'right';
-        cell3.style.paddingLeft = '5px';
-        cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
+      } catch (error) {
+        console.error('Lỗi khi xử lý dữ liệu sản phẩm:', error);
+        noDataMessage.style.display = 'block'; // Hiển thị thông báo nếu có lỗi
       }
+    } else {
+      noDataMessage.style.display = 'block'; // Hiển thị thông báo nếu không có data
+    }
+
+    // Thêm dòng Tổng tiền hàng
+    const totalRow = table.insertRow();
+    const cell1 = totalRow.insertCell(0);
+    cell1.colSpan = 4;
+    cell1.style.fontWeight = 'bold';
+    cell1.style.textAlign = 'right';
+    cell1.style.paddingLeft = '5px';
+    cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
+
+    // Kiểm tra và thêm dòng Đơn cũ còn và Tổng cộng
+    const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
+    if (donCuConValue !== 0 && donCuCon !== '') {
+      const donCuConRow = table.insertRow();
+      const cell2 = donCuConRow.insertCell(0);
+      cell2.colSpan = 4;
+      cell2.style.fontWeight = 'bold';
+      cell2.style.textAlign = 'right';
+      cell2.style.paddingLeft = '5px';
+      cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
+
+      const tongCongRow = table.insertRow();
+      const cell3 = tongCongRow.insertCell(0);
+      cell3.colSpan = 4;
+      cell3.style.fontWeight = 'bold';
+      cell3.style.textAlign = 'right';
+      cell3.style.paddingLeft = '5px';
+      cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
     }
   </script>
 </body>
