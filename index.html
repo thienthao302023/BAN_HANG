@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=80mm, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
     /* Toàn bộ trang dùng font Arial, không có margin và padding mặc định */
@@ -11,67 +11,90 @@
       margin: 0;
       padding: 0;
     }
-    /* Khu vực hóa đơn: rộng 80%, căn giữa, padding 20px */
+    /* Khu vực hóa đơn: rộng 80mm, căn giữa, padding 5px */
     .invoice {
-      width: 80%;
-      margin: 20px auto;
-      padding: 20px;
+      width: 80mm; /* Phù hợp khổ K80 */
+      margin: 0 auto;
+      padding: 5px;
     }
     /* Tiêu đề "HOÁ ĐƠN": căn giữa, chữ to, đậm */
     .header {
       text-align: center;
-      font-size: 40px;
+      font-size: 20px; /* Giảm từ 40px để phù hợp K80 */
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 5px;
     }
     /* Phần thông tin khách hàng và ngày bán */
     .info {
-      margin-bottom: 30px;
+      margin-bottom: 5px;
     }
-    /* Các đoạn thông tin trong phần info có khoảng cách 5px trên dưới và chữ size 25 */
+    /* Các đoạn thông tin trong phần info có khoảng cách 2px trên dưới và chữ size 12 */
     .info p {
-      margin: 5px 0;
-      font-size: 25px;
+      margin: 2px 0;
+      font-size: 12px; /* Phù hợp cho K80 */
+      line-height: 1.2;
     }
-    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 25, viền 1.5px đen */
+    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 12, viền 0.5px đen */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
-      font-size: 25px;
-      border: 1.5px solid #000;
+      margin-bottom: 5px;
+      font-size: 12px; /* Phù hợp cho K80 */
+      border: 0.5px solid #000;
     }
-    /* Các ô trong bảng có padding 8px và viền 1px đen */
+    /* Các ô trong bảng có padding 3px và viền 0.5px đen */
     th, td {
-      padding: 8px;
-      border: 1px solid #000;
+      padding: 3px;
+      border: 0.5px solid #000;
     }
-    /* Tiêu đề bảng: chữ đậm, size 25, căn giữa, không có màu nền */
+    /* Tiêu đề bảng: chữ đậm, size 12, căn giữa */
     th {
       font-weight: bold;
-      font-size: 25px;
+      font-size: 12px; /* Phù hợp cho K80 */
       text-align: center;
     }
-    /* Độ rộng từng cột trong bảng */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
-    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
+    /* Độ rộng từng cột trong bảng, tối ưu cho K80 */
+    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 50%; } /* Giảm từ 60% */
+    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 10%; } /* Tăng từ 5% */
+    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 20%; } /* Tăng từ 15% */
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
-    /* Căn trái cho cột sản phẩm, có padding trái 10px */
+    /* Căn trái cho cột sản phẩm, padding trái 5px */
     #invoiceTable td:nth-child(1) {
       text-align: left;
-      padding-left: 10px;
+      padding-left: 5px;
     }
-    /* Các cột SL, Đ.GIÁ, T.TIỀN căn phải, padding phải 10px */
+    /* Các cột SL, Đ.GIÁ, T.TIỀN căn phải, padding phải 5px */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
       text-align: right;
-      padding-right: 10px;
+      padding-right: 5px;
     }
-    /* Toàn bộ ô trong bảng có chữ size 25 */
+    /* Toàn bộ ô trong bảng có chữ size 12 */
     #invoiceTable td {
-      font-size: 25px;
+      font-size: 12px; /* Phù hợp cho K80 */
+    }
+    /* Tối ưu cho in ấn trên khổ K80 */
+    @media print {
+      body, .invoice {
+        width: 80mm;
+        margin: 0;
+        padding: 0;
+        page-break-inside: avoid;
+      }
+      .header {
+        font-size: 18px;
+        margin-bottom: 3px;
+      }
+      .info p {
+        font-size: 10px;
+        margin: 1px 0;
+      }
+      table, th, td {
+        font-size: 10px;
+        padding: 2px;
+        border: 0.5px solid #000;
+      }
     }
   </style>
 </head>
@@ -137,7 +160,7 @@
       cell1.colSpan = 4; // Chiếm hết 4 cột
       cell1.style.fontWeight = 'bold';
       cell1.style.textAlign = 'right';
-      cell1.style.paddingLeft = '10px';
+      cell1.style.paddingLeft = '5px';
       cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
 
       // Kiểm tra nếu đơn cũ còn khác 0 và không rỗng thì hiển thị hai dòng "Đơn cũ còn" và "Tổng cộng"
@@ -149,7 +172,7 @@
         cell2.colSpan = 4;
         cell2.style.fontWeight = 'bold';
         cell2.style.textAlign = 'right';
-        cell2.style.paddingLeft = '10px';
+        cell2.style.paddingLeft = '5px';
         cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
         // Thêm dòng Tổng cộng
@@ -158,7 +181,7 @@
         cell3.colSpan = 4;
         cell3.style.fontWeight = 'bold';
         cell3.style.textAlign = 'right';
-        cell3.style.paddingLeft = '10px';
+        cell3.style.paddingLeft = '5px';
         cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
       }
     }
