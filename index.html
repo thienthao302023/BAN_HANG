@@ -2,157 +2,104 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <!-- Meta viewport chuẩn để iPhone hiển thị đúng tỉ lệ khổ in 80mm, không zoom -->
   <meta name="viewport" content="width=80mm, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    /* ======== CSS CHUNG ======== */
     body {
-      font-family: Arial, sans-serif; /* Font chữ dễ đọc */
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box; /* Tính padding + border vào width/height */
     }
 
-    /* Khung bao toàn bộ hóa đơn */
+    /* Container chứa hóa đơn */
+    .invoice-wrapper {
+      transform: scale(1.15); /* Tăng 15% toàn bộ nội dung */
+      transform-origin: top left; /* Giữ góc trên trái làm điểm cố định khi phóng */
+    }
+
     .invoice {
-      width: 80mm; /* Khổ giấy K80 */
+      width: 80mm;
       margin: 0 auto;
       padding: 5px;
     }
 
-    /* Tiêu đề hóa đơn */
     .header {
       text-align: center;
-      font-size: 25px; /* Tăng từ 20px lên 25px */
+      font-size: 20px;
       font-weight: bold;
       margin-bottom: 5px;
     }
 
-    /* Khu vực thông tin khách hàng + ngày bán */
-    .info {
-      margin-bottom: 5px;
-    }
-
-    /* Dòng thông tin khách + ngày bán */
     .info p {
       margin: 2px 0;
-      font-size: 17px; /* Tăng từ 12px lên 17px */
-      line-height: 1.2;
+      font-size: 12px;
     }
 
-    /* ======== BẢNG SẢN PHẨM ======== */
     table {
       width: 100%;
-      border-collapse: collapse !important; /* Gộp viền */
+      border-collapse: collapse;
       margin-bottom: 5px;
-      font-size: 17px; /* Tăng từ 12px lên 17px */
-      border: 2px solid #000; /* Viền ngoài */
-      box-sizing: border-box;
-      background-color: #fff; /* Nền trắng để in rõ */
+      font-size: 12px;
+      border: 2px solid #000;
     }
 
-    /* Ô tiêu đề và dữ liệu */
     th, td {
-      border: 1px solid #000; /* Viền ô */
+      border: 1px solid #000;
       padding: 2px 4px;
-      box-sizing: border-box;
-      line-height: 1.2;
-      vertical-align: middle; /* Căn giữa theo chiều dọc */
-    }
-
-    /* Tiêu đề cột */
-    th {
-      font-weight: bold;
-      font-size: 17px; /* Tăng từ 12px lên 17px */
       text-align: center;
     }
 
-    /* Độ rộng từng cột */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 50%; }
-    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 10%; }
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 20%; }
-    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
-
-    /* Cột tên sản phẩm căn trái */
     #invoiceTable td:nth-child(1) {
       text-align: left;
-      padding-left: 5px;
     }
 
-    /* Cột SL, Đơn giá, Thành tiền căn phải */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
       text-align: right;
-      padding-right: 5px;
     }
 
-    /* Chữ size 17 cho toàn bộ bảng */
-    #invoiceTable td {
-      font-size: 17px; /* Tăng từ 12px lên 17px */
-    }
-
-    /* Khi không có sản phẩm */
     .no-data {
       text-align: center;
-      font-size: 17px; /* Tăng từ 12px lên 17px */
+      font-size: 12px;
       color: red;
-      margin: 5px 0;
     }
 
-    /* ======== CHẾ ĐỘ IN ======== */
     @media print {
-      body, .invoice {
-        width: 80mm;
+      body {
         margin: 0;
-        padding: 0;
-        page-break-inside: avoid; /* Tránh cắt hóa đơn khi in */
       }
-      .header {
-        font-size: 23px; /* Tăng từ 18px lên 23px */
-        margin-bottom: 3px;
-      }
-      .info p {
-        font-size: 15px; /* Tăng từ 10px lên 15px */
-        margin: 1px 0;
-      }
-      table, th, td {
-        font-size: 15px; /* Tăng từ 10px lên 15px */
-        padding: 2px;
-        border: 1px solid #000;
-        border-style: solid;
-      }
-      .no-data {
-        font-size: 15px; /* Tăng từ 10px lên 15px */
+      .invoice-wrapper {
+        transform: scale(1.15);
+        transform-origin: top left;
       }
     }
   </style>
 </head>
 <body>
-  <div class="invoice" id="invoiceContent">
-    <div class="header">HOÁ ĐƠN</div>
-    <div class="info">
-      <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
-      <p id="ngayBan">Ngày bán: [Ngày bán]</p>
-    </div>
+  <div class="invoice-wrapper">
+    <div class="invoice" id="invoiceContent">
+      <div class="header">HOÁ ĐƠN</div>
+      <div class="info">
+        <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
+        <p id="ngayBan">Ngày bán: [Ngày bán]</p>
+      </div>
 
-    <!-- Bảng sản phẩm -->
-    <table id="invoiceTable">
-      <tr>
-        <th>SẢN PHẨM</th>
-        <th>SL</th>
-        <th>Đ.GIÁ</th>
-        <th>T.TIỀN</th>
-      </tr>
-    </table>
-    <div id="noDataMessage" class="no-data" style="display: none;">
-      Không có sản phẩm nào được cung cấp.
+      <table id="invoiceTable">
+        <tr>
+          <th>SẢN PHẨM</th>
+          <th>SL</th>
+          <th>Đ.GIÁ</th>
+          <th>T.TIỀN</th>
+        </tr>
+      </table>
+      <div id="noDataMessage" class="no-data" style="display: none;">
+        Không có sản phẩm nào được cung cấp.
+      </div>
     </div>
   </div>
 
   <script>
-    /* ======== LẤY DỮ LIỆU TỪ URL ======== */
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
@@ -161,31 +108,28 @@
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const data = urlParams.get('data') || '';
 
-    // Gán dữ liệu vào HTML
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
     document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-    /* ======== XỬ LÝ DANH SÁCH SẢN PHẨM ======== */
     const table = document.getElementById('invoiceTable');
     const noDataMessage = document.getElementById('noDataMessage');
     let tongGia = 0;
 
     if (data) {
       try {
-        // Tách từng sản phẩm (_b_ là dấu phân cách giữa các sản phẩm)
         const rows = decodeURIComponent(data).split('_b_');
         if (rows.length > 0 && rows[0] !== '') {
           rows.forEach(record => {
-            const items = record.split('_a_'); // _a_ là dấu phân cách giữa các trường
+            const items = record.split('_a_');
             if (items.length >= 4) {
               const row = table.insertRow();
-              row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Tên sản phẩm
-              row.insertCell(1).textContent = items[1]; // SL
+              row.insertCell(0).textContent = items[0].replace(/_/g, ',');
+              row.insertCell(1).textContent = items[1];
               const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
               const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-              row.insertCell(2).textContent = donGia.toLocaleString(); // Đơn giá
-              row.insertCell(3).textContent = thanhTien.toLocaleString(); // Thành tiền
+              row.insertCell(2).textContent = donGia.toLocaleString();
+              row.insertCell(3).textContent = thanhTien.toLocaleString();
               tongGia += thanhTien;
             }
           });
@@ -200,16 +144,13 @@
       noDataMessage.style.display = 'block';
     }
 
-    /* ======== THÊM DÒNG TỔNG ======== */
     const totalRow = table.insertRow();
     const cell1 = totalRow.insertCell(0);
     cell1.colSpan = 4;
     cell1.style.fontWeight = 'bold';
     cell1.style.textAlign = 'right';
-    cell1.style.paddingLeft = '5px';
     cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
 
-    // Nếu có đơn cũ còn nợ và tổng cộng
     const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
     if (donCuConValue !== 0 && donCuCon !== '') {
       const donCuConRow = table.insertRow();
@@ -217,7 +158,6 @@
       cell2.colSpan = 4;
       cell2.style.fontWeight = 'bold';
       cell2.style.textAlign = 'right';
-      cell2.style.paddingLeft = '5px';
       cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
       const tongCongRow = table.insertRow();
@@ -225,7 +165,6 @@
       cell3.colSpan = 4;
       cell3.style.fontWeight = 'bold';
       cell3.style.textAlign = 'right';
-      cell3.style.paddingLeft = '5px';
       cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
     }
   </script>
