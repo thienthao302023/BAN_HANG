@@ -5,73 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    /* Toàn bộ trang dùng font Arial, không có margin và padding mặc định */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
-    /* Khu vực hóa đơn: rộng 80%, căn giữa, padding 20px */
     .invoice {
-      width: 80%;
-      margin: 20px auto;
-      padding: 20px;
+      width: 100%; /* Sử dụng toàn bộ chiều rộng */
+      margin: 0; /* Loại bỏ margin trái phải */
+      padding: 5px; /* Giảm padding */
     }
-    /* Tiêu đề "HOÁ ĐƠN": căn giữa, chữ to, đậm */
     .header {
       text-align: center;
-      font-size: 40px;
+      font-size: 40px; /* Giữ nguyên kích thước tiêu đề */
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 10px; /* Giảm margin dưới */
     }
-    /* Phần thông tin khách hàng và ngày bán */
     .info {
-      margin-bottom: 30px;
+      margin-bottom: 15px; /* Giảm margin */
     }
-    /* Các đoạn thông tin trong phần info có khoảng cách 5px trên dưới và chữ size 25 */
     .info p {
-      margin: 5px 0;
-      font-size: 30px;
+      margin: 5px 0; /* Giữ khoảng cách giữa các dòng */
+      font-size: 30px; /* Giữ nguyên kích thước chữ */
     }
-    /* Bảng sản phẩm: rộng 100%, gộp viền, chữ size 25, viền 1.5px đen */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
-      font-size: 30px;
-      border: 1.5px solid #000;
+      margin-bottom: 10px; /* Giảm margin */
+      font-size: 30px; /* Giữ nguyên kích thước chữ */
+      border: 1px solid #000; /* Giảm độ dày viền */
     }
-    /* Các ô trong bảng có padding 8px và viền 1px đen */
     th, td {
-      padding: 8px;
-      border: 1px solid #000;
+      padding: 4px; /* Giảm padding */
+      border: 1px solid #000; /* Giảm độ dày viền */
     }
-    /* Tiêu đề bảng: chữ đậm, size 25, căn giữa, không có màu nền */
     th {
       font-weight: bold;
-      font-size: 30px;
+      font-size: 30px; /* Giữ nguyên kích thước chữ */
       text-align: center;
     }
-    /* Độ rộng từng cột trong bảng */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 60%; }
+    /* Điều chỉnh chiều rộng cột */
+    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 65%; }
     #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
     #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
-    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 20%; }
-    /* Căn trái cho cột sản phẩm, có padding trái 10px */
+    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 15%; }
     #invoiceTable td:nth-child(1) {
       text-align: left;
-      padding-left: 10px;
+      padding-left: 5px; /* Giảm padding trái */
     }
-    /* Các cột SL, Đ.GIÁ, T.TIỀN căn phải, padding phải 10px */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) {
       text-align: right;
-      padding-right: 10px;
+      padding-right: 5px; /* Giảm padding phải */
     }
-    /* Toàn bộ ô trong bảng có chữ size 25 */
     #invoiceTable td {
-      font-size: 30px;
+      font-size: 30px; /* Giữ nguyên kích thước chữ */
     }
   </style>
 </head>
@@ -79,12 +68,9 @@
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
     <div class="info">
-      <!-- Hiển thị tên khách hàng -->
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
-      <!-- Hiển thị ngày bán -->
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
     </div>
-    <!-- Bảng chứa các sản phẩm -->
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
@@ -96,69 +82,61 @@
   </div>
 
   <script>
-    // Lấy các tham số từ URL
     const urlParams = new URLSearchParams(window.location.search);
-    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]'; // Mã đơn hàng
-    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]'; // Tên khách hàng
-    const donCuCon = urlParams.get('doncucon') || '0'; // Đơn cũ còn, mặc định là 0 nếu không có
-    const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng, mặc định là 0 nếu không có
-    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán
-    const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm
+    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
+    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
+    const donCuCon = urlParams.get('doncucon') || '0';
+    const tongCong = urlParams.get('tongcong') || '0';
+    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+    const data = urlParams.get('data') || '';
 
-    // Cập nhật tiêu đề trang và thông tin khách hàng, ngày bán
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
     document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
     if (data) {
-      // Tách các dòng sản phẩm theo '_b_'
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
-      let tongGia = 0; // Biến tính tổng tiền sản phẩm
+      let tongGia = 0;
 
-      // Thêm các dòng sản phẩm vào bảng
       rows.forEach(record => {
         const items = record.split('_a_');
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Cột sản phẩm: thay dấu _ thành dấu phẩy
-          row.insertCell(1).textContent = items[1]; // Cột số lượng
-          const donGia = parseInt(items[2].replace(/,/g, '')) || 0; // Lấy đơn giá, bỏ dấu phẩy
-          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0; // Lấy thành tiền, bỏ dấu phẩy
-          row.insertCell(2).textContent = donGia.toLocaleString(); // Hiển thị đơn giá với dấu phẩy
-          row.insertCell(3).textContent = thanhTien.toLocaleString(); // Hiển thị thành tiền với dấu phẩy
-          tongGia += thanhTien; // Cộng dồn tổng tiền sản phẩm
+          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
+          row.insertCell(1).textContent = items[1];
+          const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
+          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
+          row.insertCell(2).textContent = donGia.toLocaleString();
+          row.insertCell(3).textContent = thanhTien.toLocaleString();
+          tongGia += thanhTien;
         }
       });
 
-      // Thêm dòng Tổng tiền hàng
       const totalRow = table.insertRow();
       const cell1 = totalRow.insertCell(0);
-      cell1.colSpan = 4; // Chiếm hết 4 cột
+      cell1.colSpan = 4;
       cell1.style.fontWeight = 'bold';
       cell1.style.textAlign = 'right';
-      cell1.style.paddingLeft = '10px';
+      cell1.style.paddingLeft = '5px';
       cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
 
-      // Kiểm tra nếu đơn cũ còn khác 0 và không rỗng thì hiển thị hai dòng "Đơn cũ còn" và "Tổng cộng"
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       if (donCuConValue !== 0 && donCuCon !== '') {
-        // Thêm dòng Đơn cũ còn
         const donCuConRow = table.insertRow();
         const cell2 = donCuConRow.insertCell(0);
         cell2.colSpan = 4;
         cell2.style.fontWeight = 'bold';
         cell2.style.textAlign = 'right';
-        cell2.style.paddingLeft = '10px';
+        cell2.style.paddingLeft = '5px';
         cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
-        // Thêm dòng Tổng cộng
         const tongCongRow = table.insertRow();
         const cell3 = tongCongRow.insertCell(0);
         cell3.colSpan = 4;
         cell3.style.fontWeight = 'bold';
         cell3.style.textAlign = 'right';
-        cell3.style.paddingLeft = '10px';
+        cell3.style.paddingLeft = '5px';
         cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
       }
     }
