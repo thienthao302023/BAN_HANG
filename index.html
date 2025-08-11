@@ -11,13 +11,13 @@
       padding: 0;
     }
     .invoice {
-      width: 100%; /* Sử dụng toàn bộ chiều rộng */
+      width: 99%; /* Sử dụng toàn bộ chiều rộng */
       margin: 0; /* Loại bỏ margin trái phải */
       padding: 5px; /* Giảm padding */
     }
     .header {
       text-align: center;
-      font-size: 30px; /* Giảm từ 40px xuống 30px */
+      font-size: 35px; /* Giảm từ 40px xuống 35px */
       font-weight: bold;
       margin-bottom: 10px; /* Giảm margin dưới */
     }
@@ -26,13 +26,13 @@
     }
     .info p {
       margin: 5px 0; /* Giữ khoảng cách giữa các dòng */
-      font-size: 20px; /* Giảm từ 30px xuống 20px */
+      font-size: 25px; /* Giảm từ 30px xuống 25px */
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 10px; /* Giảm margin */
-      font-size: 20px; /* Giảm từ 30px xuống 20px */
+      font-size: 25px; /* Giảm từ 30px xuống 25px */
       border: 1px solid #000; /* Giảm độ dày viền */
     }
     th, td {
@@ -41,7 +41,7 @@
     }
     th {
       font-weight: bold;
-      font-size: 20px; /* Giảm từ 30px xuống 20px */
+      font-size: 25px; /* Giảm từ 30px xuống 25px */
       text-align: center;
     }
     /* Điều chỉnh chiều rộng cột */
@@ -60,7 +60,12 @@
       padding-right: 5px; /* Giảm padding phải */
     }
     #invoiceTable td {
-      font-size: 20px; /* Giảm từ 30px xuống 20px */
+      font-size: 25px; /* Giảm từ 30px xuống 25px */
+    }
+    .note {
+      font-size: 20px; /* Chú thích với kích thước 20px */
+      text-align: center;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -79,6 +84,7 @@
         <th>T.TIỀN</th>
       </tr>
     </table>
+    <div class="note">* Chú thích: Giá đã bao gồm thuế VAT. Vui lòng kiểm tra kỹ trước khi rời quầy.</div>
   </div>
 
   <script>
