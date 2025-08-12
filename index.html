@@ -86,6 +86,7 @@
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const donCuCon = urlParams.get('doncucon') || '0';
+    const khachTra = urlParams.get('khachtra') || '0';
     const tongCong = urlParams.get('tongcong') || '0';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const data = urlParams.get('data') || '';
@@ -131,13 +132,24 @@
         cell2.style.paddingLeft = '5px';
         cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
 
+        const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
+        if (khachTraValue !== 0 && khachTra !== '') {
+          const khachTraRow = table.insertRow();
+          const cell3 = khachTraRow.insertCell(0);
+          cell3.colSpan = 4;
+          cell3.style.fontWeight = 'bold';
+          cell3.style.textAlign = 'right';
+          cell3.style.paddingLeft = '5px';
+          cell3.textContent = `Khách trả: ${khachTraValue.toLocaleString()} VNĐ`;
+        }
+
         const tongCongRow = table.insertRow();
-        const cell3 = tongCongRow.insertCell(0);
-        cell3.colSpan = 4;
-        cell3.style.fontWeight = 'bold';
-        cell3.style.textAlign = 'right';
-        cell3.style.paddingLeft = '5px';
-        cell3.textContent = `Tổng cộng: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
+        const cell4 = tongCongRow.insertCell(0);
+        cell4.colSpan = 4;
+        cell4.style.fontWeight = 'bold';
+        cell4.style.textAlign = 'right';
+        cell4.style.paddingLeft = '5px';
+        cell4.textContent = `Tổng cộng còn: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
       }
     }
   </script>
