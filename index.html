@@ -115,41 +115,65 @@
       });
 
       const totalRow = table.insertRow();
-      const cell1 = totalRow.insertCell(0);
-      cell1.colSpan = 4;
-      cell1.style.fontWeight = 'bold';
-      cell1.style.textAlign = 'right';
-      cell1.style.paddingLeft = '5px';
-      cell1.textContent = `Tổng tiền hàng: ${tongGia.toLocaleString()} VNĐ`;
+      const totalCell1 = totalRow.insertCell(0);
+      totalCell1.colSpan = 2;
+      totalCell1.style.fontWeight = 'bold';
+      totalCell1.style.textAlign = 'right';
+      totalCell1.style.paddingLeft = '5px';
+      totalCell1.textContent = `Tổng tiền hàng:`;
+      const totalCell2 = totalRow.insertCell(1);
+      totalCell2.colSpan = 2;
+      totalCell2.style.fontWeight = 'bold';
+      totalCell2.style.textAlign = 'right';
+      totalCell2.style.paddingRight = '5px';
+      totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       if (donCuConValue !== 0 && donCuCon !== '') {
         const donCuConRow = table.insertRow();
-        const cell2 = donCuConRow.insertCell(0);
-        cell2.colSpan = 4;
-        cell2.style.fontWeight = 'bold';
-        cell2.style.textAlign = 'right';
-        cell2.style.paddingLeft = '5px';
-        cell2.textContent = `Đơn cũ còn: ${donCuConValue.toLocaleString()} VNĐ`;
+        const donCuConCell1 = donCuConRow.insertCell(0);
+        donCuConCell1.colSpan = 2;
+        donCuConCell1.style.fontWeight = 'bold';
+        donCuConCell1.style.textAlign = 'right';
+        donCuConCell1.style.paddingLeft = '5px';
+        donCuConCell1.textContent = `Đơn cũ còn:`;
+        const donCuConCell2 = donCuConRow.insertCell(1);
+        donCuConCell2.colSpan = 2;
+        donCuConCell2.style.fontWeight = 'bold';
+        donCuConCell2.style.textAlign = 'right';
+        donCuConCell2.style.paddingRight = '5px';
+        donCuConCell2.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
 
         const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
         if (khachTraValue !== 0 && khachTra !== '') {
           const khachTraRow = table.insertRow();
-          const cell3 = khachTraRow.insertCell(0);
-          cell3.colSpan = 4;
-          cell3.style.fontWeight = 'bold';
-          cell3.style.textAlign = 'right';
-          cell3.style.paddingLeft = '5px';
-          cell3.textContent = `Khách trả: ${khachTraValue.toLocaleString()} VNĐ`;
+          const khachTraCell1 = khachTraRow.insertCell(0);
+          khachTraCell1.colSpan = 2;
+          khachTraCell1.style.fontWeight = 'bold';
+          khachTraCell1.style.textAlign = 'right';
+          khachTraCell1.style.paddingLeft = '5px';
+          khachTraCell1.textContent = `Khách trả:`;
+          const khachTraCell2 = khachTraRow.insertCell(1);
+          khachTraCell2.colSpan = 2;
+          khachTraCell2.style.fontWeight = 'bold';
+          khachTraCell2.style.textAlign = 'right';
+          khachTraCell2.style.paddingRight = '5px';
+          khachTraCell2.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
         }
 
         const tongCongRow = table.insertRow();
-        const cell4 = tongCongRow.insertCell(0);
-        cell4.colSpan = 4;
-        cell4.style.fontWeight = 'bold';
-        cell4.style.textAlign = 'right';
-        cell4.style.paddingLeft = '5px';
-        cell4.textContent = `Tổng cộng còn: ${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
+        const tongCongCell1 = tongCongRow.insertCell(0);
+        tongCongCell1.colSpan = 2;
+        tongCongCell1.style.fontWeight = 'bold';
+        tongCongCell1.style.textAlign = 'right';
+        tongCongCell1.style.paddingLeft = '5px';
+        tongCongCell1.textContent = `Tổng cộng còn:`;
+        const tongCongCell2 = tongCongRow.insertCell(1);
+        tongCongCell2.colSpan = 2;
+        tongCongCell2.style.fontWeight = 'bold';
+        tongCongCell2.style.textAlign = 'right';
+        tongCongCell2.style.paddingRight = '5px';
+        tongCongCell2.textContent = `${parseInt(decodeURIComponent(tongCong)).toLocaleString()} VNĐ`;
       }
     }
   </script>
