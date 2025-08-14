@@ -226,7 +226,8 @@
         const imgWidth = 190; // chiều rộng ảnh trong PDF (mm)
         const imgHeight = (canvas.height * imgWidth) / canvas.width; // chiều cao tương ứng
         const pageWidth = 210; // chiều rộng A4 (mm)
-        const pageHeight = imgHeight + 20; // chiều cao tùy chỉnh, thêm lề 20mm
+        const minPageHeight = 297; // chiều cao tối thiểu (A4, 297mm)
+        const pageHeight = Math.max(imgHeight + 20, minPageHeight); // chọn chiều cao lớn nhất giữa nội dung và chiều cao tối thiểu
 
         // Tạo PDF với kích thước trang tùy chỉnh
         const pdf = new jsPDF({
