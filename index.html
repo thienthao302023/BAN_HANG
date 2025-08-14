@@ -62,19 +62,30 @@
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; }
 
-    /* Nút tải PNG */
-    #downloadBtn {
+    /* Nút tải */
+    .button-container {
       margin: 10px;
+    }
+    #downloadBtn, #downloadPdfBtn {
       font-size: 20px;
       padding: 10px 20px;
-      background-color: #4CAF50;
+      margin-right: 10px;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
+    #downloadBtn {
+      background-color: #4CAF50;
+    }
     #downloadBtn:hover {
       background-color: #45a049;
+    }
+    #downloadPdfBtn {
+      background-color: #008CBA;
+    }
+    #downloadPdfBtn:hover {
+      background-color: #006d93;
     }
   </style>
 </head>
@@ -96,11 +107,15 @@
     </table>
   </div>
 
-  <!-- ======== Nút tải PNG ======== -->
-  <button id="downloadBtn">Tải PNG</button>
+  <!-- ======== Các nút tải ======== -->
+  <div class="button-container">
+    <button id="downloadBtn">Tải PNG</button>
+    <button id="downloadPdfBtn">Tải PDF</button>
+  </div>
 
-  <!-- ======== Thư viện html2canvas ======== -->
+  <!-- ======== Thư viện html2canvas và jsPDF ======== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
     // ======== Lấy dữ liệu từ query string ========
@@ -128,7 +143,7 @@
         const items = record.split('_a_'); // tách thông tin từng sản phẩm
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
+          row.insertCell(0). textContent = items[0].replace(/_/g, ',');
           row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
@@ -197,10 +212,49 @@
       });
     }
 
+    // ======== Hàm tải hóa đơn dưới dạng PDF ========
+    function downloadInvoiceAsPdf() {
+      const invoiceElement = document.getElementById("invoiceContent");
+      html2canvas(invoiceElement, {
+        scale: 3, // tăng độ nét
+        useCORS: true
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const imgWidth = 190; // chiều rộng ảnh trong PDF (mm)
+        const pageHeight = pdf.internal.pageSize.height;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 10; // vị trí bắt đầu từ đầu trang
+
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Nếu nội dung dài, thêm trang mới
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save('hoa_don.pdf'); // tên file PDF
+      });
+    }
+
     // ======== Sự kiện bấm nút tải PNG ========
     document.getElementById("downloadBtn").addEventListener("click", downloadInvoiceAsPng);
 
-    // ======== Phím tắt Ctrl+S trên máy tính ========
+    // ======== Sự kiện bấm nút tải PDF ========
+    document.getElementById("downloadPdfBtn").addEventListener("click", downloadInvoiceAsPdf);
+
+    // ======== Phím tắt Ctrl+S trên máy tính (tải PNG) ========
     document.addEventListener("keydown", function(e) {
       if (e.ctrlKey && e.key.toLowerCase() === 's') {
         e.preventDefault(); // chặn save mặc định
