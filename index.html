@@ -239,8 +239,17 @@
         // Thêm ảnh hóa đơn vào trang
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
 
+        // Lấy thời gian hiện tại và định dạng tên file
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const fileName = `hoa_don_${year}${month}${day}_${hours}${minutes}.pdf`;
+
         // Lưu file PDF
-        pdf.save('hoa_don.pdf'); // tên file PDF
+        pdf.save(fileName); // tên file PDF
       });
     }
 
