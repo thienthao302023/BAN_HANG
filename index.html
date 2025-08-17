@@ -164,13 +164,13 @@
       // ======== Thêm dòng tổng tiền ========
       const totalRow = table.insertRow(); // Thêm dòng tổng tiền
       const totalCell1 = totalRow.insertCell(0);
-      totalCell1.colSpan = 2; // Gộp 2 cột
+      totalCell1.colSpan = 1; // Gộp 1 cột
       totalCell1.style.fontWeight = 'bold'; // Chữ đậm
       totalCell1.style.textAlign = 'right'; // Căn phải
       totalCell1.style.paddingLeft = '5px'; // Khoảng cách lót trái
       totalCell1.textContent = `Tổng tiền hàng:`; // Nhãn
       const totalCell2 = totalRow.insertCell(1);
-      totalCell2.colSpan = 2; // Gộp 2 cột
+      totalCell2.colSpan = 3; // Gộp 3 cột
       totalCell2.style.fontWeight = 'bold'; // Chữ đậm
       totalCell2.style.textAlign = 'right'; // Căn phải
       totalCell2.style.paddingRight = '5px'; // Khoảng cách lót phải
@@ -184,25 +184,49 @@
       if (donCuConValue !== 0) { // Nếu có đơn cũ còn
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 2; cell1.style.fontWeight='bold'; cell1.style.textAlign='right'; cell1.textContent='Đơn cũ còn:';
+        cell1.colSpan = 1; // Gộp 1 cột
+        cell1.style.fontWeight = 'bold'; // Chữ đậm
+        cell1.style.textAlign = 'right'; // Căn phải
+        cell1.style.paddingLeft = '5px'; // Khoảng cách lót trái
+        cell1.textContent = 'Đơn cũ còn:';
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 2; cell2.style.fontWeight='bold'; cell2.style.textAlign='right'; cell2.textContent=donCuConValue.toLocaleString()+' VNĐ';
+        cell2.colSpan = 3; // Gộp 3 cột
+        cell2.style.fontWeight = 'bold'; // Chữ đậm
+        cell2.style.textAlign = 'right'; // Căn phải
+        cell2.style.paddingRight = '5px'; // Khoảng cách lót phải
+        cell2.textContent = donCuConValue.toLocaleString() + ' VNĐ';
       }
 
       if (khachTraValue !== 0) { // Nếu có khách trả
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 2; cell1.style.fontWeight='bold'; cell1.style.textAlign='right'; cell1.textContent='Khách trả:';
+        cell1.colSpan = 1; // Gộp 1 cột
+        cell1.style.fontWeight = 'bold'; // Chữ đậm
+        cell1.style.textAlign = 'right'; // Căn phải
+        cell1.style.paddingLeft = '5px'; // Khoảng cách lót trái
+        cell1.textContent = 'Khách trả:';
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 2; cell2.style.fontWeight='bold'; cell2.style.textAlign='right'; cell2.textContent=khachTraValue.toLocaleString()+' VNĐ';
+        cell2.colSpan = 3; // Gộp 3 cột
+        cell2.style.fontWeight = 'bold'; // Chữ đậm
+        cell2.style.textAlign = 'right'; // Căn phải
+        cell2.style.paddingRight = '5px'; // Khoảng cách lót phải
+        cell2.textContent = khachTraValue.toLocaleString() + ' VNĐ';
       }
 
       if (tongCongValue !== 0) { // Nếu có tổng cộng còn
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 2; cell1.style.fontWeight='bold'; cell1.style.textAlign='right'; cell1.textContent='Tổng cộng còn:';
+        cell1.colSpan = 1; // Gộp 1 cột
+        cell1.style.fontWeight = 'bold'; // Chữ đậm
+        cell1.style.textAlign = 'right'; // Căn phải
+        cell1.style.paddingLeft = '5px'; // Khoảng cách lót trái
+        cell1.textContent = 'Tổng cộng còn:';
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 2; cell2.style.fontWeight='bold'; cell2.style.textAlign='right'; cell2.textContent=tongCongValue.toLocaleString()+' VNĐ';
+        cell2.colSpan = 3; // Gộp 3 cột
+        cell2.style.fontWeight = 'bold'; // Chữ đậm
+        cell2.style.textAlign = 'right'; // Căn phải
+        cell2.style.paddingRight = '5px'; // Khoảng cách lót phải
+        cell2.textContent = tongCongValue.toLocaleString() + ' VNĐ';
       }
     }
 
