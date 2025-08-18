@@ -214,7 +214,7 @@
       }
 
       // Chỉ hiển thị Tổng cộng còn nếu có Đơn cũ còn hoặc Khách trả
-      if ((donCuConValue !== 0 || khachTraValue !== 0) && tongCongValue !== 0) {
+      if (donCuConValue !== 0 || khachTraValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
         cell1.colSpan = 1; // Gộp 1 cột
@@ -231,7 +231,7 @@
       }
     }
 
-    // ======== Hàm tải hóa trên dưới dạng PNG ========
+    // ======== Hàm tải hóa đơn dưới dạng PNG ========
     function downloadInvoiceAsPng() {
       const invoiceElement = document.getElementById("invoiceContent"); // Lấy phần tử hóa đơn
       html2canvas(invoiceElement, {
@@ -249,7 +249,7 @@
     function downloadInvoiceAsPdf() {
       const invoiceElement = document.getElementById("invoiceContent"); // Lấy phần tử hóa đơn
       html2canvas(invoiceElement, {
-        scale: 3, // Tăng Độ nét
+        scale: 3, // Tăng độ nét
         useCORS: true // Hỗ trợ tải tài nguyên ngoài
       }).then(canvas => {
         const imgData = canvas.toDataURL('image/png'); // Chuyển canvas thành dữ liệu ảnh
