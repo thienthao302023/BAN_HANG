@@ -17,7 +17,6 @@
       margin: 0; /* Không có lề */
       padding: 5px; /* Khoảng cách lót bên trong */
     }
-
     /* ======== Header ======== */
     .header {
       text-align: center; /* Căn giữa tiêu đề */
@@ -25,7 +24,6 @@
       font-weight: bold; /* Chữ đậm */
       margin-bottom: 10px; /* Khoảng cách dưới */
     }
-
     /* ======== Thông tin khách hàng ======== */
     .info {
       margin-bottom: 15px; /* Khoảng cách dưới */
@@ -34,7 +32,6 @@
       margin: 5px 0; /* Khoảng cách trên/dưới cho mỗi dòng */
       font-size: 20px; /* Kích thước chữ */
     }
-
     /* ======== Bảng hóa đơn ======== */
     table {
       width: 100%; /* Chiếm toàn bộ chiều rộng */
@@ -51,18 +48,15 @@
       font-weight: bold; /* Chữ đậm cho tiêu đề bảng */
       text-align: center; /* Căn giữa */
     }
-
     /* Điều chỉnh chiều rộng cột */
     #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 65%; } /* Cột Sản phẩm */
     #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; } /* Cột Số lượng */
     #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; } /* Cột Đơn giá */
     #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 15%; } /* Cột Thành tiền */
-
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; } /* Căn trái cột Sản phẩm */
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; } /* Căn phải các cột còn lại */
-
     /* ======== Nút tải ======== */
     .button-container {
       margin: 10px; /* Khoảng cách xung quanh */
@@ -97,6 +91,7 @@
     <div class="info">
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p> <!-- Thông tin khách hàng -->
       <p id="ngayBan">Ngày bán: [Ngày bán]</p> <!-- Ngày bán -->
+      <p id="ghiChu">Ghi chú: [GHI CHÚ]</p> <!-- Ghi chú - sẽ ẩn nếu rỗng -->
     </div>
     <table id="invoiceTable">
       <tr>
@@ -107,17 +102,14 @@
       </tr>
     </table>
   </div>
-
   <!-- ======== Các nút tải ======== -->
   <div class="button-container">
     <button id="downloadBtn">Tải PNG</button> <!-- Nút tải file PNG -->
     <button id="downloadPdfBtn">Tải PDF</button> <!-- Nút tải file PDF -->
   </div>
-
   <!-- ======== Thư viện html2canvas và jsPDF ======== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <script>
     // ======== Lấy dữ liệu từ query string ========
     const urlParams = new URLSearchParams(window.location.search); // Lấy tham số từ URL
@@ -127,10 +119,12 @@
     const khachTra = urlParams.get('khachtra') || '0'; // Khách trả, mặc định là 0
     const tongCong = urlParams.get('tongcong') || '0'; // Tổng cộng còn, mặc định là 0
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]'; // Ngày bán, mặc định nếu không có
+    const ghiChu = urlParams.get('ghichu') || ''; // Ghi chú - mới thêm
     const data = urlParams.get('data') || ''; // Dữ liệu sản phẩm, mặc định rỗng
 
     // ======== Cập nhật tiêu đề trang và thông tin khách hàng ========
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang); // Cập nhật tiêu đề trang
+
     const tenKhachValue = decodeURIComponent(tenKhach); // Giải mã tên khách hàng
     if (tenKhachValue && tenKhachValue !== '[KHÁCH HÀNG]') {
       // Nếu tên khách hàng hợp lệ (không rỗng và không phải placeholder)
@@ -139,14 +133,24 @@
       // Nếu tên khách hàng rỗng hoặc là placeholder, ẩn dòng khách hàng
       document.getElementById('tenKhach').style.display = 'none';
     }
+
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`; // Cập nhật ngày bán
+
+    // ======== Xử lý Ghi chú ========
+    const ghiChuValue = decodeURIComponent(ghiChu).trim(); // Giải mã và loại bỏ khoảng trắng thừa
+    if (ghiChuValue !== '') {
+      // Nếu có nội dung ghi chú thì hiển thị
+      document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
+    } else {
+      // Nếu rỗng thì ẩn dòng ghi chú
+      document.getElementById('ghiChu').style.display = 'none';
+    }
 
     // ======== Thêm dữ liệu sản phẩm vào bảng ========
     if (data) {
       const rows = decodeURIComponent(data).split('_b_'); // Tách danh sách sản phẩm
       const table = document.getElementById('invoiceTable'); // Lấy bảng hóa đơn
       let tongGia = 0; // Biến tính tổng tiền hàng
-
       rows.forEach(record => {
         const items = record.split('_a_'); // Tách thông tin từng sản phẩm
         if (items.length >= 4) { // Kiểm tra đủ dữ liệu (tên, số lượng, đơn giá, thành tiền)
@@ -160,7 +164,6 @@
           tongGia += thanhTien; // Cộng vào tổng tiền
         }
       });
-
       // ======== Thêm dòng tổng tiền ========
       const totalRow = table.insertRow(); // Thêm dòng tổng tiền
       const totalCell1 = totalRow.insertCell(0);
@@ -175,12 +178,10 @@
       totalCell2.style.textAlign = 'right'; // Căn phải
       totalCell2.style.paddingRight = '5px'; // Khoảng cách lót phải
       totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`; // Tổng tiền có định dạng
-
       // ======== Thêm các dòng Đơn cũ, Khách trả, Tổng cộng còn ========
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0; // Giá trị đơn cũ còn
       const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0; // Giá trị khách trả
       const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0; // Giá trị tổng cộng còn
-
       if (donCuConValue !== 0) { // Nếu có đơn cũ còn
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
@@ -196,7 +197,6 @@
         cell2.style.paddingRight = '5px'; // Khoảng cách lót phải
         cell2.textContent = donCuConValue.toLocaleString() + ' VNĐ';
       }
-
       if (khachTraValue !== 0) { // Nếu có khách trả
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
@@ -212,7 +212,6 @@
         cell2.style.paddingRight = '5px'; // Khoảng cách lót phải
         cell2.textContent = khachTraValue.toLocaleString() + ' VNĐ';
       }
-
       // Chỉ hiển thị Tổng cộng còn nếu có Đơn cũ còn hoặc Khách trả
       if (donCuConValue !== 0 || khachTraValue !== 0) {
         const row = table.insertRow();
@@ -230,7 +229,6 @@
         cell2.textContent = tongCongValue.toLocaleString() + ' VNĐ';
       }
     }
-
     // ======== Hàm tải hóa đơn dưới dạng PNG ========
     function downloadInvoiceAsPng() {
       const invoiceElement = document.getElementById("invoiceContent"); // Lấy phần tử hóa đơn
@@ -244,7 +242,6 @@
         link.click(); // Tự động nhấn để tải
       });
     }
-
     // ======== Hàm tải hóa đơn dưới dạng PDF ========
     function downloadInvoiceAsPdf() {
       const invoiceElement = document.getElementById("invoiceContent"); // Lấy phần tử hóa đơn
@@ -254,24 +251,20 @@
       }).then(canvas => {
         const imgData = canvas.toDataURL('image/png'); // Chuyển canvas thành dữ liệu ảnh
         const { jsPDF } = window.jspdf; // Lấy thư viện jsPDF
-
         // Tính kích thước trang PDF dựa trên nội dung
         const imgWidth = 190; // Chiều rộng ảnh trong PDF (mm)
         const imgHeight = (canvas.height * imgWidth) / canvas.width; // Chiều cao tương ứng
         const pageWidth = 210; // Chiều rộng A4 (mm)
         const minPageHeight = 297; // Chiều cao tối thiểu A4 (mm)
         const pageHeight = Math.max(imgHeight + 20, minPageHeight); // Chọn chiều cao lớn hơn
-
         // Tạo PDF với kích thước trang tùy chỉnh
         const pdf = new jsPDF({
           orientation: 'portrait', // Hướng dọc
           unit: 'mm', // Đơn vị mm
           format: [pageWidth, pageHeight] // Kích thước trang tùy chỉnh
         });
-
         // Thêm ảnh hóa đơn vào trang
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-
         // Lấy thời gian hiện tại và định dạng tên file
         const now = new Date();
         const year = now.getFullYear();
@@ -280,18 +273,14 @@
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const fileName = `hoa_don_${year}${month}${day}_${hours}${minutes}.pdf`;
-
         // Lưu file PDF
         pdf.save(fileName); // Tải file PDF
       });
     }
-
     // ======== Sự kiện bấm nút tải PNG ========
     document.getElementById("downloadBtn").addEventListener("click", downloadInvoiceAsPng);
-
     // ======== Sự kiện bấm nút tải PDF ========
     document.getElementById("downloadPdfBtn").addEventListener("click", downloadInvoiceAsPdf);
-
     // ======== Phím tắt Ctrl+S trên máy tính (tải PNG) ========
     document.addEventListener("keydown", function(e) {
       if (e.ctrlKey && e.key.toLowerCase() === 's') {
