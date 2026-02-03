@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    /* ======== Cấu hình chung ======== */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -53,7 +52,6 @@
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; }
 
-    /* ======== Nút ======== */
     .button-container {
       margin: 10px;
       text-align: center;
@@ -100,12 +98,10 @@
     <button id="sharePdfBtn">Chia sẻ PDF</button>
   </div>
 
-  <!-- Thư viện cần thiết -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
-    // ======== Lấy dữ liệu từ query string ========
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
@@ -116,10 +112,8 @@
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
-    // Cập nhật tiêu đề trang
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
-    // Tên khách hàng (ẩn nếu không có)
     const tenKhachValue = decodeURIComponent(tenKhach);
     if (tenKhachValue && tenKhachValue !== '[KHÁCH HÀNG]') {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
@@ -127,10 +121,8 @@
       document.getElementById('tenKhach').style.display = 'none';
     }
 
-    // Ngày bán
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-    // Ghi chú (ẩn nếu rỗng)
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue !== '') {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
@@ -138,7 +130,6 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // ======== Thêm dữ liệu sản phẩm vào bảng ========
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
@@ -147,17 +138,16 @@
         const items = record.split('_a_');
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Tên sản phẩm
-          row.insertCell(1).textContent = items[1]; // Số lượng
+          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
+          row.insertCell(1).textContent = items[1];
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString(); // Đơn giá
-          row.insertCell(3).textContent = thanhTien.toLocaleString(); // Thành tiền
+          row.insertCell(2).textContent = donGia.toLocaleString();
+          row.insertCell(3).textContent = thanhTien.toLocaleString();
           tongGia += thanhTien;
         }
       });
 
-      // Dòng tổng tiền hàng
       const totalRow = table.insertRow();
       const totalCell1 = totalRow.insertCell(0);
       totalCell1.colSpan = 1;
@@ -172,7 +162,6 @@
       totalCell2.style.paddingRight = '5px';
       totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
-      // Đơn cũ còn / Khách trả / Tổng cộng còn
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0;
@@ -208,7 +197,6 @@
       }
     }
 
-    // ======== Hàm chụp ảnh hóa đơn (dùng chung) ========
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), {
         scale: 3,
@@ -216,26 +204,21 @@
       });
     }
 
-    // ======== CHIA SẺ ẢNH ========
     async function shareInvoice() {
       try {
         const canvas = await captureInvoice();
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        if (!blob) throw new Error("Không tạo được ảnh");
+        if (!blob) return;
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-        const shareData = { files: [file] };
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share(shareData);
-        } else {
-          alert("Trình duyệt không hỗ trợ chia sẻ file trực tiếp.\nHãy chụp màn hình hóa đơn hoặc thử trên thiết bị khác.");
+          await navigator.share({ files: [file] });
         }
       } catch (err) {
-        alert("Không thể chia sẻ: " + (err.message || "Lỗi không xác định"));
+        // im lặng, không báo lỗi
       }
     }
 
-    // ======== CHIA SẺ PDF ========
     async function shareInvoiceAsPdf() {
       try {
         const canvas = await captureInvoice();
@@ -244,8 +227,7 @@
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         const pageWidth = 210;
-        const minPageHeight = 297;
-        const pageHeight = Math.max(imgHeight + 20, minPageHeight);
+        const pageHeight = Math.max(imgHeight + 20, 297);
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidth, pageHeight] });
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
 
@@ -253,19 +235,14 @@
         const fileName = `hoa_don_${maDonHang || new Date().toISOString().slice(0,10)}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-        const shareData = { files: [pdfFile] };
-
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share(shareData);
-        } else {
-          alert("Trình duyệt không hỗ trợ chia sẻ PDF trực tiếp.\nHãy thử mở file PDF thủ công hoặc dùng thiết bị khác.");
+          await navigator.share({ files: [pdfFile] });
         }
       } catch (err) {
-        alert("Không thể chia sẻ PDF: " + (err.message || "Lỗi không xác định"));
+        // im lặng, không báo lỗi
       }
     }
 
-    // ======== Gắn sự kiện ========
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
     document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
   </script>
