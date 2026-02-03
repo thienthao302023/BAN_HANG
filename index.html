@@ -67,20 +67,12 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    #downloadBtn {
-      background-color: #4CAF50;
-    }
-    #downloadBtn:hover { background-color: #45a049; }
-    #downloadPdfBtn {
-      background-color: #008CBA;
-    }
-    #downloadPdfBtn:hover { background-color: #006d93; }
     #shareBtn {
       background-color: #673ab7;
     }
     #shareBtn:hover { background-color: #512da8; }
     #sharePdfBtn {
-      background-color: #e91e63;   /* Màu khác biệt để dễ phân biệt */
+      background-color: #e91e63;
     }
     #sharePdfBtn:hover { background-color: #c2185b; }
   </style>
@@ -104,8 +96,6 @@
   </div>
 
   <div class="button-container">
-    <button id="downloadBtn">Tải PNG</button>
-    <button id="downloadPdfBtn">Tải PDF</button>
     <button id="shareBtn">Chia sẻ</button>
     <button id="sharePdfBtn">Chia sẻ PDF</button>
   </div>
@@ -226,55 +216,26 @@
       });
     }
 
-    // ======== TẢI PNG ========
-    async function downloadInvoiceAsPng() {
-      const canvas = await captureInvoice();
-      const link = document.createElement('a');
-      link.download = 'hoa_don.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-
-    // ======== TẢI PDF ========
-    async function downloadInvoiceAsPdf() {
-      const canvas = await captureInvoice();
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pageWidth = 210;
-      const minPageHeight = 297;
-      const pageHeight = Math.max(imgHeight + 20, minPageHeight);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidth, pageHeight] });
-      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-      const now = new Date();
-      const fileName = `hoa_don_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.pdf`;
-      pdf.save(fileName);
-    }
-
     // ======== CHIA SẺ ẢNH ========
     async function shareInvoice() {
       try {
         const canvas = await captureInvoice();
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error("Không tạo được ảnh");
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
         const shareData = { files: [file] };
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share(shareData);
         } else {
-          const link = document.createElement('a');
-          link.download = 'hoa_don.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          alert("Trình duyệt không hỗ trợ chia sẻ file trực tiếp.\nẢnh đã tải về → mở Zalo chọn ảnh từ thư viện.");
+          alert("Trình duyệt không hỗ trợ chia sẻ file trực tiếp.\nHãy chụp màn hình hóa đơn hoặc thử trên thiết bị khác.");
         }
       } catch (err) {
         alert("Không thể chia sẻ: " + (err.message || "Lỗi không xác định"));
       }
     }
 
-    // ======== CHIA SẺ PDF (mới) ========
+    // ======== CHIA SẺ PDF ========
     async function shareInvoiceAsPdf() {
       try {
         const canvas = await captureInvoice();
@@ -297,8 +258,7 @@
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           await navigator.share(shareData);
         } else {
-          pdf.save(fileName);
-          alert("Trình duyệt không hỗ trợ chia sẻ PDF trực tiếp.\nFile PDF đã tải về → mở Zalo/Messenger chọn file để gửi.");
+          alert("Trình duyệt không hỗ trợ chia sẻ PDF trực tiếp.\nHãy thử mở file PDF thủ công hoặc dùng thiết bị khác.");
         }
       } catch (err) {
         alert("Không thể chia sẻ PDF: " + (err.message || "Lỗi không xác định"));
@@ -306,18 +266,8 @@
     }
 
     // ======== Gắn sự kiện ========
-    document.getElementById("downloadBtn").addEventListener("click", downloadInvoiceAsPng);
-    document.getElementById("downloadPdfBtn").addEventListener("click", downloadInvoiceAsPdf);
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
     document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
-
-    // Phím tắt Ctrl + S → tải PNG
-    document.addEventListener("keydown", function(e) {
-      if (e.ctrlKey && e.key.toLowerCase() === 's') {
-        e.preventDefault();
-        downloadInvoiceAsPng();
-      }
-    });
   </script>
 </body>
 </html>
