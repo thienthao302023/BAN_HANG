@@ -12,105 +12,102 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: #f8f8f8; /* Nền nhẹ để dễ phân biệt */
     }
     .invoice {
       width: 100%;
-      margin: 0;
-      padding: 5px;
+      max-width: 800px; /* Giới hạn chiều rộng để đẹp hơn trên màn hình lớn */
+      margin: 0 auto;
+      padding: 15px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Bóng nhẹ cho cảm giác giấy */
+      box-sizing: border-box;
     }
 
     /* ======== Header ======== */
     .header {
       text-align: center;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #d32f2f; /* Màu đỏ nổi bật */
     }
 
     /* ======== Thông tin khách hàng ======== */
     .info {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      font-size: 18px;
     }
     .info p {
-      margin: 5px 0;
-      font-size: 20px;
+      margin: 8px 0;
     }
 
     /* ======== Bảng hóa đơn ======== */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 20px;
-      border: 1px solid #000;
+      margin-bottom: 15px;
+      font-size: 18px;
+      border: 1px solid #333;
     }
     th, td {
-      padding: 4px;
-      border: 1px solid #000;
-    }
-    th {
-      font-weight: bold;
+      padding: 8px 6px;
+      border: 1px solid #333;
       text-align: center;
     }
-
-    /* Điều chỉnh chiều rộng các cột */
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 65%; } /* Sản phẩm */
-    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }  /* SL */
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; } /* Đơn giá */
-    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 15%; } /* Thành tiền */
-
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:nth-child(2),
-    #invoiceTable td:nth-child(3),
-    #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; }
-
-    /* ======== Khu vực nút ======== */
-    .button-container {
-      margin: 10px;
+    th {
+      background: #f0f0f0;
+      font-weight: bold;
     }
-    #downloadBtn, #downloadPdfBtn, #shareBtn {
-      font-size: 20px;
-      padding: 10px 20px;
-      margin-right: 10px;
+    td:nth-child(1) { text-align: left; padding-left: 10px; }
+    td:nth-child(2), td:nth-child(3), td:nth-child(4) { text-align: right; padding-right: 10px; }
+
+    /* ======== Nút chức năng ======== */
+    .button-container {
+      text-align: center;
+      margin: 20px 10px;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 0 8px 12px;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      min-width: 140px;
     }
-    #downloadBtn {
-      background-color: #4CAF50; /* Xanh lá - Tải PNG */
-    }
-    #downloadBtn:hover { background-color: #45a049; }
-
-    #downloadPdfBtn {
-      background-color: #008CBA; /* Xanh dương - Tải PDF */
-    }
-    #downloadPdfBtn:hover { background-color: #006d93; }
-
-    #shareBtn {
-      background-color: #673ab7; /* Tím - Chia sẻ */
-    }
-    #shareBtn:hover { background-color: #512da8; }
+    #downloadBtn { background: #4CAF50; }
+    #downloadBtn:hover { background: #43A047; }
+    #downloadPdfBtn { background: #2196F3; }
+    #downloadPdfBtn:hover { background: #1E88E5; }
+    #shareBtn { background: #673AB7; }
+    #shareBtn:hover { background: #5E35B1; }
   </style>
 </head>
 
 <body>
-  <!-- ======== Nội dung hóa đơn (sẽ được chụp ảnh để tải/chia sẻ) ======== -->
+
+  <!-- ======== Phần nội dung hóa đơn chính (sẽ được chụp ảnh) ======== -->
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
+
     <div class="info">
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
-      <p id="ngayBan">Ngày bán: [Ngày bán]</p>
-      <p id="ghiChu">Ghi chú: [GHI CHÚ]</p>
+      <p id="ngayBan">Ngày bán: [NGÀY BÁN]</p>
+      <p id="ghiChu" style="display:none;">Ghi chú: [GHI CHÚ]</p>
     </div>
 
     <table id="invoiceTable">
-      <tr>
-        <th>SẢN PHẨM</th>
-        <th>SL</th>
-        <th>Đ.GIÁ</th>
-        <th>T.TIỀN</th>
-      </tr>
+      <thead>
+        <tr>
+          <th>SẢN PHẨM</th>
+          <th>SL</th>
+          <th>Đ.GIÁ</th>
+          <th>T.TIỀN</th>
+        </tr>
+      </thead>
+      <tbody></tbody> <!-- Dữ liệu sản phẩm sẽ được thêm bằng JS -->
     </table>
   </div>
 
@@ -121,12 +118,12 @@
     <button id="shareBtn">Chia sẻ</button>
   </div>
 
-  <!-- ======== Thư viện cần thiết ======== -->
+  <!-- ======== Thư viện ======== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
-    // ======== 1. Lấy tất cả tham số từ URL (query string) ========
+    // ======== 1. Lấy dữ liệu từ URL query string ========
     const urlParams = new URLSearchParams(window.location.search);
 
     const maDonHang  = urlParams.get('madonhang')  || '[MÃ ĐƠN HÀNG]';
@@ -134,11 +131,11 @@
     const donCuCon   = urlParams.get('doncucon')   || '0';
     const khachTra   = urlParams.get('khachtra')   || '0';
     const tongCong   = urlParams.get('tongcong')   || '0';
-    const ngayBan    = urlParams.get('ngayban')    || '[Ngày bán]';
+    const ngayBan    = urlParams.get('ngayban')    || new Date().toLocaleString('vi-VN');
     const ghiChu     = urlParams.get('ghichu')     || '';
-    const data       = urlParams.get('data')       || '';  // chuỗi dữ liệu sản phẩm
+    const data       = urlParams.get('data')       || '';
 
-    // ======== 2. Cập nhật tiêu đề trang và thông tin hiển thị ========
+    // ======== 2. Cập nhật giao diện ========
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
     const tenKhachValue = decodeURIComponent(tenKhach);
@@ -151,169 +148,151 @@
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
-    if (ghiChuValue !== '') {
+    if (ghiChuValue) {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
-    } else {
-      document.getElementById('ghiChu').style.display = 'none';
+      document.getElementById('ghiChu').style.display = 'block';
     }
 
-    // ======== 3. Xử lý và hiển thị danh sách sản phẩm vào bảng ========
+    // ======== 3. Xử lý danh sách sản phẩm ========
+    let tongGia = 0;
     if (data) {
-      const rows = decodeURIComponent(data).split('_b_'); // mỗi sản phẩm cách nhau bởi _b_
-      const table = document.getElementById('invoiceTable');
-      let tongGia = 0;
+      const rows = decodeURIComponent(data).split('_b_');
+      const tbody = document.querySelector('#invoiceTable tbody');
 
       rows.forEach(record => {
-        const items = record.split('_a_'); // các trường: tên_số lượng_đơn giá_thành tiền
+        const items = record.split('_a_');
         if (items.length >= 4) {
-          const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // thay _ bằng dấu phẩy
-          row.insertCell(1).textContent = items[1];
-          const donGia   = parseInt(items[2].replace(/,/g, '')) || 0;
-          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString();
-          row.insertCell(3).textContent = thanhTien.toLocaleString();
-          tongGia += thanhTien;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${items[0].replace(/_/g, ',')}</td>
+            <td>${items[1]}</td>
+            <td>${Number(items[2].replace(/,/g,'')).toLocaleString()}</td>
+            <td>${Number(items[3].replace(/,/g,'')).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+          tongGia += Number(items[3].replace(/,/g,'')) || 0;
         }
       });
 
-      // ======== Thêm dòng Tổng tiền hàng ========
-      const totalRow = table.insertRow();
-      totalRow.insertCell(0).innerHTML = '<strong style="float:right; padding-right:5px;">Tổng tiền hàng:</strong>';
-      const totalCell = totalRow.insertCell(1);
-      totalCell.colSpan = 3;
-      totalCell.style.fontWeight = 'bold';
-      totalCell.style.textAlign = 'right';
-      totalCell.style.paddingRight = '5px';
-      totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
+      // Dòng tổng tiền hàng
+      const totalTr = document.createElement('tr');
+      totalTr.innerHTML = `
+        <td colspan="3" style="text-align:right; font-weight:bold; padding-right:10px;">Tổng tiền hàng:</td>
+        <td style="font-weight:bold;">${tongGia.toLocaleString()} VNĐ</td>
+      `;
+      tbody.appendChild(totalTr);
 
-      // ======== Thêm thông tin thanh toán (nếu có) ========
-      const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
-      const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
-      const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0;
+      // Các dòng thanh toán bổ sung
+      const donCuConVal = Number(decodeURIComponent(donCuCon)) || 0;
+      const khachTraVal = Number(decodeURIComponent(khachTra)) || 0;
+      const tongCongVal = Number(decodeURIComponent(tongCong)) || 0;
 
-      if (donCuConValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).innerHTML = '<strong style="float:right; padding-right:5px;">Đơn cũ còn:</strong>';
-        const cell = row.insertCell(1);
-        cell.colSpan = 3;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = donCuConValue.toLocaleString() + ' VNĐ';
+      if (donCuConVal) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="3" style="text-align:right; font-weight:bold; padding-right:10px;">Đơn cũ còn:</td><td style="font-weight:bold;">${donCuConVal.toLocaleString()} VNĐ</td>`;
+        tbody.appendChild(tr);
       }
-
-      if (khachTraValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).innerHTML = '<strong style="float:right; padding-right:5px;">Khách trả:</strong>';
-        const cell = row.insertCell(1);
-        cell.colSpan = 3;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = khachTraValue.toLocaleString() + ' VNĐ';
+      if (khachTraVal) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="3" style="text-align:right; font-weight:bold; padding-right:10px;">Khách trả:</td><td style="font-weight:bold;">${khachTraVal.toLocaleString()} VNĐ</td>`;
+        tbody.appendChild(tr);
       }
-
-      if (donCuConValue !== 0 || khachTraValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).innerHTML = '<strong style="float:right; padding-right:5px;">Tổng cộng còn:</strong>';
-        const cell = row.insertCell(1);
-        cell.colSpan = 3;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = tongCongValue.toLocaleString() + ' VNĐ';
+      if (donCuConVal || khachTraVal) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="3" style="text-align:right; font-weight:bold; padding-right:10px;">Tổng cộng còn:</td><td style="font-weight:bold;">${tongCongVal.toLocaleString()} VNĐ</td>`;
+        tbody.appendChild(tr);
       }
     }
 
-    // ======== 4. Hàm tải hóa đơn dạng PNG ========
+    // ======== 4. Hàm chụp ảnh sạch (sử dụng onclone để loại bỏ phần thừa nếu có) ========
+    async function captureCleanCanvas() {
+      return html2canvas(document.getElementById('invoiceContent'), {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Làm sạch bản clone: chỉ giữ lại nội dung hóa đơn
+          const body = clonedDoc.body;
+          body.innerHTML = '';
+          body.appendChild(clonedDoc.getElementById('invoiceContent').cloneNode(true));
+          body.style.margin = '0';
+          body.style.padding = '0';
+          // Xóa mọi text có thể bị dính từ chat hoặc overlay
+          const ps = body.querySelectorAll('p');
+          ps.forEach(p => {
+            if (p.textContent.includes('Khách hàng:') && p.textContent.includes('Ngày:') && p.parentElement !== document.getElementById('info')) {
+              p.remove();
+            }
+          });
+        }
+      });
+    }
+
+    // ======== 5. Tải PNG ========
     function downloadInvoiceAsPng() {
-      html2canvas(document.getElementById("invoiceContent"), {
-        scale: 3,       // tăng độ nét
-        useCORS: true   // hỗ trợ font/icon ngoài
-      }).then(canvas => {
+      captureCleanCanvas().then(canvas => {
         const link = document.createElement('a');
         link.download = 'hoa_don.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-      });
+      }).catch(err => alert('Lỗi tải PNG: ' + err.message));
     }
 
-    // ======== 5. Hàm tải hóa đơn dạng PDF ========
+    // ======== 6. Tải PDF ========
     function downloadInvoiceAsPdf() {
-      html2canvas(document.getElementById("invoiceContent"), {
-        scale: 3,
-        useCORS: true
-      }).then(canvas => {
+      captureCleanCanvas().then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
-
         const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pageWidth = 210;
-        const minPageHeight = 297;
-        const pageHeight = Math.max(imgHeight + 20, minPageHeight);
-
+        const imgHeight = canvas.height * imgWidth / canvas.width;
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
-          format: [pageWidth, pageHeight]
+          format: [210, Math.max(imgHeight + 30, 297)]
         });
-
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
 
         const now = new Date();
-        const fileName = `hoa_don_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}.pdf`;
-        pdf.save(fileName);
-      });
+        const filename = `hoadon_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`;
+        pdf.save(filename);
+      }).catch(err => alert('Lỗi tải PDF: ' + err.message));
     }
 
-    // ======== 6. Hàm CHIA SẺ hóa đơn (sử dụng Web Share API) ========
+    // ======== 7. Chia sẻ ảnh (chỉ file, không caption thừa) ========
     async function shareInvoice() {
       try {
-        const canvas = await html2canvas(document.getElementById("invoiceContent"), {
-          scale: 3,
-          useCORS: true
-        });
+        const canvas = await captureCleanCanvas();
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
 
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error('Không tạo được ảnh');
 
-        if (!blob) throw new Error("Không tạo được ảnh");
+        const file = new File([blob], 'hoa_don.png', { type: 'image/png' });
 
-        // Tên file cố định - không thêm mã đơn hàng hay thời gian
-        const file = new File([blob], "hoa_don.png", { type: 'image/png' });
+        const shareData = { files: [file] }; // Không thêm title/text để tránh caption thừa
 
-        const shareData = {
-          files: [file],
-          title: `Hóa đơn ${decodeURIComponent(maDonHang)}`,
-          text: `Khách hàng: ${tenKhachValue || 'N/A'} - Ngày: ${decodeURIComponent(ngayBan)}`
-        };
-
-        // Kiểm tra trình duyệt có hỗ trợ chia sẻ file không
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share(shareData);
-          // Thành công → không cần thông báo
         } else {
-          // Fallback: tải file về và hướng dẫn
+          // Fallback tải về
           const link = document.createElement('a');
           link.download = 'hoa_don.png';
           link.href = canvas.toDataURL('image/png');
           link.click();
-          alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp.\nẢnh đã được tải về → bạn mở ảnh và chia sẻ từ thư viện ảnh nhé!");
+          alert('Không hỗ trợ chia sẻ trực tiếp.\nĐã tải ảnh sạch về máy → mở từ thư viện ảnh để chia sẻ.');
         }
       } catch (err) {
-        console.error("Lỗi chia sẻ:", err);
-        alert("Không thể chia sẻ: " + (err.message || "Lỗi không xác định"));
+        alert('Lỗi chia sẻ: ' + (err.message || 'Không xác định'));
       }
     }
 
-    // ======== 7. Gắn sự kiện click cho các nút ========
-    document.getElementById("downloadBtn").addEventListener("click", downloadInvoiceAsPng);
-    document.getElementById("downloadPdfBtn").addEventListener("click", downloadInvoiceAsPdf);
-    document.getElementById("shareBtn").addEventListener("click", shareInvoice);
+    // ======== 8. Gắn sự kiện ========
+    document.getElementById('downloadBtn').onclick = downloadInvoiceAsPng;
+    document.getElementById('downloadPdfBtn').onclick = downloadInvoiceAsPdf;
+    document.getElementById('shareBtn').onclick = shareInvoice;
 
-    // ======== 8. Phím tắt Ctrl + S → tải PNG (trên máy tính) ========
-    document.addEventListener("keydown", function(e) {
+    // Ctrl + S → tải PNG
+    document.addEventListener('keydown', e => {
       if (e.ctrlKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         downloadInvoiceAsPng();
