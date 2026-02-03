@@ -52,6 +52,7 @@
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
     #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; }
+
     /* ======== Nút ======== */
     .button-container {
       margin: 10px;
@@ -103,10 +104,12 @@
     <button id="shareBtn">Chia sẻ</button>
   </div>
 
+  <!-- Thư viện cần thiết -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script>
-    // ======== Lấy dữ liệu từ query string (giữ nguyên) ========
+    // ======== Lấy dữ liệu từ query string ========
     const urlParams = new URLSearchParams(window.location.search);
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
@@ -117,15 +120,21 @@
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
+    // Cập nhật tiêu đề trang
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
+
+    // Tên khách hàng (ẩn nếu không có)
     const tenKhachValue = decodeURIComponent(tenKhach);
     if (tenKhachValue && tenKhachValue !== '[KHÁCH HÀNG]') {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
     } else {
       document.getElementById('tenKhach').style.display = 'none';
     }
+
+    // Ngày bán
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
+    // Ghi chú (ẩn nếu rỗng)
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue !== '') {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
@@ -133,21 +142,22 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // ======== Thêm dữ liệu sản phẩm (giữ nguyên) ========
+    // ======== Thêm dữ liệu sản phẩm vào bảng ========
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
+
       rows.forEach(record => {
         const items = record.split('_a_');
         if (items.length >= 4) {
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
-          row.insertCell(1).textContent = items[1];
+          row.insertCell(0).textContent = items[0].replace(/_/g, ','); // Tên sản phẩm
+          row.insertCell(1).textContent = items[1]; // Số lượng
           const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString();
-          row.insertCell(3).textContent = thanhTien.toLocaleString();
+          row.insertCell(2).textContent = donGia.toLocaleString(); // Đơn giá
+          row.insertCell(3).textContent = thanhTien.toLocaleString(); // Thành tiền
           tongGia += thanhTien;
         }
       });
@@ -160,6 +170,7 @@
       totalCell1.style.textAlign = 'right';
       totalCell1.style.paddingLeft = '5px';
       totalCell1.textContent = `Tổng tiền hàng:`;
+
       const totalCell2 = totalRow.insertCell(1);
       totalCell2.colSpan = 3;
       totalCell2.style.fontWeight = 'bold';
@@ -167,7 +178,7 @@
       totalCell2.style.paddingRight = '5px';
       totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
-      // Đơn cũ còn, Khách trả, Tổng cộng còn (giữ nguyên logic)
+      // Đơn cũ còn / Khách trả / Tổng cộng còn
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0;
@@ -181,6 +192,7 @@
         cell2.colSpan = 3; cell2.style.fontWeight = 'bold'; cell2.style.textAlign = 'right'; cell2.style.paddingRight = '5px';
         cell2.textContent = donCuConValue.toLocaleString() + ' VNĐ';
       }
+
       if (khachTraValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
@@ -190,6 +202,7 @@
         cell2.colSpan = 3; cell2.style.fontWeight = 'bold'; cell2.style.textAlign = 'right'; cell2.style.paddingRight = '5px';
         cell2.textContent = khachTraValue.toLocaleString() + ' VNĐ';
       }
+
       if (donCuConValue !== 0 || khachTraValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
@@ -201,7 +214,7 @@
       }
     }
 
-    // ======== Hàm tải PNG (giữ nguyên) ========
+    // ======== Hàm tải PNG ========
     function downloadInvoiceAsPng() {
       const invoiceElement = document.getElementById("invoiceContent");
       html2canvas(invoiceElement, { scale: 3, useCORS: true }).then(canvas => {
@@ -212,7 +225,7 @@
       });
     }
 
-    // ======== Hàm tải PDF (giữ nguyên) ========
+    // ======== Hàm tải PDF ========
     function downloadInvoiceAsPdf() {
       const invoiceElement = document.getElementById("invoiceContent");
       html2canvas(invoiceElement, { scale: 3, useCORS: true }).then(canvas => {
@@ -232,35 +245,36 @@
       });
     }
 
-    // ======== Hàm CHIA SẺ mới ========
+    // ======== Hàm CHIA SẺ (đã tối ưu để giảm chú thích ở Zalo) ========
     async function shareInvoice() {
       const invoiceElement = document.getElementById("invoiceContent");
-
       try {
+        // Chụp ảnh hóa đơn với độ phân giải cao
         const canvas = await html2canvas(invoiceElement, { scale: 3, useCORS: true });
+        
+        // Chuyển canvas thành blob (dạng file ảnh)
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-
         if (!blob) throw new Error("Không tạo được ảnh");
 
+        // Tạo file PNG với tên file (có thể đổi thành tên ngắn hơn nếu muốn thử giảm caption)
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
 
+        // CHỈ gửi file ảnh, KHÔNG title, KHÔNG text → giảm khả năng Zalo thêm chú thích
         const shareData = {
-          files: [file],
-          title: `Hóa đơn ${decodeURIComponent(maDonHang)}`,
-          text: `Khách hàng: ${tenKhachValue || 'N/A'} - Ngày: ${decodeURIComponent(ngayBan)}`
+          files: [file]
         };
 
-        // Kiểm tra hỗ trợ chia sẻ file
+        // Kiểm tra xem trình duyệt có hỗ trợ chia sẻ file không
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share(shareData);
-          // Thành công → không cần alert
+          // Thành công → không cần thông báo
         } else {
-          // Fallback: tải về và hướng dẫn
+          // Fallback: tải ảnh về máy
           const link = document.createElement('a');
           link.download = 'hoa_don.png';
           link.href = canvas.toDataURL('image/png');
           link.click();
-          alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp.\nẢnh đã tải về → bạn mở ảnh và chia sẻ từ thư viện ảnh nhé!");
+          alert("Trình duyệt không hỗ trợ chia sẻ file trực tiếp.\nẢnh đã tải về → mở Zalo, chọn ảnh từ thư viện để gửi (thường không có chú thích thừa).");
         }
       } catch (err) {
         console.error(err);
@@ -268,12 +282,12 @@
       }
     }
 
-    // ======== Gắn sự kiện ========
+    // ======== Gắn sự kiện cho các nút ========
     document.getElementById("downloadBtn").addEventListener("click", downloadInvoiceAsPng);
     document.getElementById("downloadPdfBtn").addEventListener("click", downloadInvoiceAsPdf);
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
 
-    // Phím tắt Ctrl+S → tải PNG
+    // Phím tắt Ctrl + S → tải PNG
     document.addEventListener("keydown", function(e) {
       if (e.ctrlKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
