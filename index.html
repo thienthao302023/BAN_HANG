@@ -5,15 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .invoice { width: 100%; margin: 0; padding: 5px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .invoice { 
+      width: 100%; 
+      margin: 0; 
+      padding: 5px; 
+    }
     .header {
       text-align: center;
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 10px;
     }
-    .info p { margin: 5px 0; font-size: 20px; }
+    .info p { 
+      margin: 5px 0; 
+      font-size: 20px; 
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -22,16 +33,43 @@
       border: 1px solid #000;
     }
     th, td {
-      padding: 4px;
+      padding: 5px 4px;
       border: 1px solid #000;
     }
-    th { font-weight: bold; text-align: center; }
-   
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
+    th { 
+      font-weight: bold; 
+      text-align: center; 
+    }
+
+    /* ==================== PHÂN BỔ KÍCH THƯỚC CỘT ==================== */
+    #invoiceTable th:nth-child(1), 
+    #invoiceTable td:nth-child(1) { 
+      width: 48%; 
+      text-align: left; 
+      padding-left: 6px; 
+    }
+    #invoiceTable th:nth-child(2), 
+    #invoiceTable td:nth-child(2) { 
+      width: 8%; 
+    }
+    #invoiceTable th:nth-child(3), 
+    #invoiceTable td:nth-child(3) { 
+      width: 15%; 
+    }
+    #invoiceTable th:nth-child(4), 
+    #invoiceTable td:nth-child(4) { 
+      width: 10%; 
+    }
+    #invoiceTable th:nth-child(5), 
+    #invoiceTable td:nth-child(5) { 
+      width: 19%; 
+    }
+
     #invoiceTable td:not(:nth-child(1)) {
       text-align: right;
-      padding-right: 5px;
+      padding-right: 6px;
     }
+
     .button-container {
       margin: 10px;
       text-align: center;
@@ -69,6 +107,7 @@
       </tr>
     </table>
   </div>
+
   <div class="button-container">
     <button id="shareBtn">Chia sẻ</button>
     <button id="sharePdfBtn">Chia sẻ PDF</button>
@@ -141,7 +180,6 @@
         hasProduct = true;
       });
 
-      // Sắp xếp theo tên sản phẩm A → Z
       detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
 
       detailRows.forEach(item => {
@@ -167,8 +205,7 @@
 
     const colSpanValue = hasAnyCK ? 4 : 3;
 
-    // ==================== THAY ĐỔI Ở ĐÂY ====================
-    // Tổng tiền hàng → đổi thành "Tổng cộng"
+    // Tổng cộng (trước đây là Tổng tiền hàng)
     if (hasProduct && tongGia > 0) {
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
@@ -193,7 +230,7 @@
       sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
     }
 
-    // Đơn cũ còn
+    // Đơn cũ còn, Khách trả, Tổng cộng còn
     const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
     if (donCuConValue !== 0) {
       const row = table.insertRow();
@@ -206,7 +243,6 @@
       cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
     }
 
-    // Khách trả
     const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
     if (khachTraValue !== 0) {
       const row = table.insertRow();
@@ -219,7 +255,6 @@
       cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
     }
 
-    // Tổng cộng còn
     const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
     if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
