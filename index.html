@@ -5,29 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .invoice {
-      width: 100%;
-      margin: 0;
-      padding: 5px;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .invoice { width: 100%; margin: 0; padding: 5px; }
     .header {
       text-align: center;
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 10px;
     }
-    .info {
-      margin-bottom: 15px;
-    }
-    .info p {
-      margin: 5px 0;
-      font-size: 20px;
-    }
+    .info p { margin: 5px 0; font-size: 20px; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -39,15 +25,10 @@
       padding: 4px;
       border: 1px solid #000;
     }
-    th {
-      font-weight: bold;
-      text-align: center;
-    }
+    th { font-weight: bold; text-align: center; }
+    
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:nth-child(2),
-    #invoiceTable td:nth-child(3),
-    #invoiceTable td:nth-child(4),
-    #invoiceTable td:nth-child(5) { 
+    #invoiceTable td:not(:nth-child(1)) { 
       text-align: right; 
       padding-right: 5px; 
     }
@@ -83,7 +64,7 @@
       <tr>
         <th>SẢN PHẨM</th>
         <th>SL</th>
-        <th id="ckHeader" style="display: none;">CK</th>
+        <th id="ckHeader">CK</th>
         <th>Đ.GIÁ</th>
         <th>T.TIỀN</th>
       </tr>
@@ -101,20 +82,21 @@
     const urlParams = new URLSearchParams(window.location.search);
     
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
-    const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
+    const tenKhach = urlParams.get('khachhang') || '';
     const donCuCon = urlParams.get('doncucon') || '0';
     const khachTra = urlParams.get('khachtra') || '0';
     const tongCong = urlParams.get('tongcong') || '0';
-    const sauCK = urlParams.get('sauck') || '0';        // <-- Giá trị [TB]
+    const sauCK = urlParams.get('sauck') || '0';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
+    // Set tiêu đề
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
     // Khách hàng
-    const tenKhachValue = decodeURIComponent(tenKhach);
-    if (tenKhachValue && tenKhachValue !== '[KHÁCH HÀNG]') {
+    const tenKhachValue = decodeURIComponent(tenKhach).trim();
+    if (tenKhachValue) {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
     } else {
       document.getElementById('tenKhach').style.display = 'none';
@@ -124,164 +106,133 @@
 
     // Ghi chú
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
-    if (ghiChuValue !== '') {
+    if (ghiChuValue) {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
     } else {
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // Xử lý bảng chi tiết
+    // Xử lý dữ liệu chi tiết
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
-      let hasCK = false;                    // Kiểm tra có CK nào không
+      let hasAnyCK = false;
 
       rows.forEach(record => {
+        if (!record.trim()) return;
+        
         const items = record.split('_a_');
-        if (items.length >= 5) {
-          const sanPham = items[0].replace(/_/g, ',');
-          const soLuong = items[1];
-          const ck = items[2];                    // CK mới
-          const donGia = parseInt(items[3].replace(/,/g, '')) || 0;
-          const thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
+        if (items.length < 5) return;
 
-          if (parseInt(ck) > 0) hasCK = true;
+        const sanPham = items[0].replace(/_/g, ',');
+        const soLuong = items[1];
+        const ck = items[2] || '0';
+        const donGia = parseInt(items[3].replace(/,/g, '')) || 0;
+        const thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
 
-          const row = table.insertRow();
-          row.insertCell(0).textContent = sanPham;
-          row.insertCell(1).textContent = soLuong;
+        if (parseFloat(ck) > 0) hasAnyCK = true;
 
-          const ckCell = row.insertCell(2);
-          ckCell.textContent = ck;
-          if (!hasCK) ckCell.style.display = 'none';   // tạm ẩn nếu chưa biết có CK
+        const row = table.insertRow();
+        row.insertCell(0).textContent = sanPham;
+        row.insertCell(1).textContent = soLuong;
+        
+        const ckCell = row.insertCell(2);
+        ckCell.textContent = ck;
+        
+        row.insertCell(3).textContent = donGia.toLocaleString();
+        row.insertCell(4).textContent = thanhTien.toLocaleString();
 
-          row.insertCell(3).textContent = donGia.toLocaleString();
-          row.insertCell(4).textContent = thanhTien.toLocaleString();
-
-          tongGia += thanhTien;
-        }
+        tongGia += thanhTien;
       });
 
-      // Hiển thị hoặc ẩn cột CK
-      document.getElementById('ckHeader').style.display = hasCK ? 'table-cell' : 'none';
+      // Ẩn cột CK nếu không có CK nào
+      const ckHeader = document.getElementById('ckHeader');
+      ckHeader.style.display = hasAnyCK ? 'table-cell' : 'none';
 
-      // Cập nhật lại tất cả các ô CK (nếu không có CK thì ẩn hết)
-      if (!hasCK) {
-        const ckCells = table.querySelectorAll('td:nth-child(3)');
-        ckCells.forEach(cell => cell.style.display = 'none');
+      if (!hasAnyCK) {
+        const allCKCells = table.querySelectorAll('tr td:nth-child(3)');
+        allCKCells.forEach(cell => cell.style.display = 'none');
       }
 
-      // ==================== DÒNG TỔNG TIỀN HÀNG ====================
+      // Dòng Tổng tiền hàng
       const totalRow = table.insertRow();
-      const totalCell1 = totalRow.insertCell(0);
-      totalCell1.colSpan = 1;
-      totalCell1.style.fontWeight = 'bold';
-      totalCell1.style.textAlign = 'right';
-      totalCell1.style.paddingLeft = '5px';
-      totalCell1.textContent = `Tổng tiền hàng:`;
+      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng tiền hàng:</td>`;
+      const totalValueCell = totalRow.insertCell(1);
+      totalValueCell.colSpan = hasAnyCK ? 4 : 3;
+      totalValueCell.style.fontWeight = 'bold';
+      totalValueCell.style.textAlign = 'right';
+      totalValueCell.style.paddingRight = '5px';
+      totalValueCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
-      const totalCell2 = totalRow.insertCell(1);
-      totalCell2.colSpan = hasCK ? 4 : 3;
-      totalCell2.style.fontWeight = 'bold';
-      totalCell2.style.textAlign = 'right';
-      totalCell2.style.paddingRight = '5px';
-      totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`;
-
-      // ==================== DÒNG SAU CK (nếu có) ====================
-      const sauCKValue = parseInt(decodeURIComponent(sauCK)) || 0;
-      if (hasCK && sauCKValue > 0) {
-        const sauCKRow = table.insertRow();
-        const sauCKCell1 = sauCKRow.insertCell(0);
-        sauCKCell1.colSpan = 1;
-        sauCKCell1.style.fontWeight = 'bold';
-        sauCKCell1.style.textAlign = 'right';
-        sauCKCell1.style.paddingLeft = '5px';
-        sauCKCell1.textContent = `Sau CK:`;
-
-        const sauCKCell2 = sauCKRow.insertCell(1);
-        sauCKCell2.colSpan = hasCK ? 4 : 3;
-        sauCKCell2.style.fontWeight = 'bold';
-        sauCKCell2.style.textAlign = 'right';
-        sauCKCell2.style.paddingRight = '5px';
-        sauCKCell2.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+      // Dòng Sau CK (chỉ hiện nếu có CK)
+      const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g,'')) || 0;
+      if (hasAnyCK && sauCKValue > 0) {
+        const sauRow = table.insertRow();
+        sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
+        const sauValueCell = sauRow.insertCell(1);
+        sauValueCell.colSpan = hasAnyCK ? 4 : 3;
+        sauValueCell.style.fontWeight = 'bold';
+        sauValueCell.style.textAlign = 'right';
+        sauValueCell.style.paddingRight = '5px';
+        sauValueCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
       }
 
-      // ==================== ĐƠN CŨ CÒN - KHÁCH TRẢ - TỔNG CÒN ====================
-      const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
-      const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
-      const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0;
+      // Đơn cũ còn, Khách trả, Tổng cộng còn
+      const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
+      const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
+      const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
+
+      const colSpanValue = hasAnyCK ? 4 : 3;
 
       if (donCuConValue !== 0) {
         const row = table.insertRow();
-        const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; 
-        cell1.style.fontWeight = 'bold'; 
-        cell1.style.textAlign = 'right'; 
-        cell1.style.paddingLeft = '5px';
-        cell1.textContent = 'Đơn cũ còn:';
-
-        const cell2 = row.insertCell(1);
-        cell2.colSpan = hasCK ? 4 : 3;
-        cell2.style.fontWeight = 'bold'; 
-        cell2.style.textAlign = 'right'; 
-        cell2.style.paddingRight = '5px';
-        cell2.textContent = donCuConValue.toLocaleString() + ' VNĐ';
+        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
+        const cell = row.insertCell(1);
+        cell.colSpan = colSpanValue;
+        cell.style.fontWeight = 'bold';
+        cell.style.textAlign = 'right';
+        cell.style.paddingRight = '5px';
+        cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
       }
 
       if (khachTraValue !== 0) {
         const row = table.insertRow();
-        const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; 
-        cell1.style.fontWeight = 'bold'; 
-        cell1.style.textAlign = 'right'; 
-        cell1.style.paddingLeft = '5px';
-        cell1.textContent = 'Khách trả:';
-
-        const cell2 = row.insertCell(1);
-        cell2.colSpan = hasCK ? 4 : 3;
-        cell2.style.fontWeight = 'bold'; 
-        cell2.style.textAlign = 'right'; 
-        cell2.style.paddingRight = '5px';
-        cell2.textContent = khachTraValue.toLocaleString() + ' VNĐ';
+        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
+        const cell = row.insertCell(1);
+        cell.colSpan = colSpanValue;
+        cell.style.fontWeight = 'bold';
+        cell.style.textAlign = 'right';
+        cell.style.paddingRight = '5px';
+        cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
       }
 
       if (donCuConValue !== 0 || khachTraValue !== 0) {
         const row = table.insertRow();
-        const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; 
-        cell1.style.fontWeight = 'bold'; 
-        cell1.style.textAlign = 'right'; 
-        cell1.style.paddingLeft = '5px';
-        cell1.textContent = 'Tổng cộng còn:';
-
-        const cell2 = row.insertCell(1);
-        cell2.colSpan = hasCK ? 4 : 3;
-        cell2.style.fontWeight = 'bold'; 
-        cell2.style.textAlign = 'right'; 
-        cell2.style.paddingRight = '5px';
-        cell2.textContent = tongCongValue.toLocaleString() + ' VNĐ';
+        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
+        const cell = row.insertCell(1);
+        cell.colSpan = colSpanValue;
+        cell.style.fontWeight = 'bold';
+        cell.style.textAlign = 'right';
+        cell.style.paddingRight = '5px';
+        cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
       }
     }
 
-    // Các hàm chia sẻ (giữ nguyên)
+    // Share functions
     async function captureInvoice() {
-      return await html2canvas(document.getElementById("invoiceContent"), {
-        scale: 3,
-        useCORS: true
-      });
+      return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
 
     async function shareInvoice() {
       try {
         const canvas = await captureInvoice();
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        if (!blob) return;
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file] });
         }
-      } catch (err) {}
+      } catch (e) {}
     }
 
     async function shareInvoiceAsPdf() {
@@ -291,17 +242,18 @@
         const { jsPDF } = window.jspdf;
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pageWidth = 210;
-        const pageHeight = Math.max(imgHeight + 20, 297);
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidth, pageHeight] });
+        const pdf = new jsPDF({ 
+          orientation: 'portrait', 
+          unit: 'mm', 
+          format: [210, Math.max(imgHeight + 20, 297)] 
+        });
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
         const pdfBlob = pdf.output('blob');
-        const fileName = `hoa_don_${maDonHang || new Date().toISOString().slice(0,10)}.pdf`;
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           await navigator.share({ files: [pdfFile] });
         }
-      } catch (err) {}
+      } catch (e) {}
     }
 
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
