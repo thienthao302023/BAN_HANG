@@ -9,37 +9,62 @@
     .invoice { width: 100%; margin: 0; padding: 5px; }
     .header { 
       text-align: center; 
-      font-size: 30px; 
+      font-size: 32px; 
       font-weight: bold; 
       margin-bottom: 10px; 
     }
     .info p { margin: 5px 0; font-size: 20px; }
+    
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-size: 20px;
       border: 1px solid #000;
     }
     th, td {
-      padding: 4px;
+      padding: 6px 4px;
       border: 1px solid #000;
     }
-    th { font-weight: bold; text-align: center; }
-    
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:not(:nth-child(1)) { 
-      text-align: right; 
-      padding-right: 5px; 
+    th { font-weight: bold; text-align: center; background-color: #f0f0f0; }
+
+    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 6px; }
+    #invoiceTable td:not(:nth-child(1)) { text-align: right; padding-right: 8px; }
+
+    /* Phần tổng kết - làm nổi bật và dễ nhìn hơn */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 21px;
+    }
+    .summary-table td {
+      padding: 8px 6px;
+      border: 1px solid #000;
+    }
+    .summary-label {
+      font-weight: bold;
+      text-align: right;
+      padding-right: 15px;
+      width: 45%;
+    }
+    .summary-value {
+      font-weight: bold;
+      text-align: right;
+      padding-right: 10px;
+    }
+    .total-line {
+      background-color: #e6f0ff;
+      font-size: 22px;
     }
 
     .button-container { 
-      margin: 10px; 
+      margin: 15px; 
       text-align: center; 
     }
     button {
       font-size: 20px;
-      padding: 10px 20px;
+      padding: 12px 25px;
       margin: 5px;
       color: white;
       border: none;
@@ -60,6 +85,8 @@
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
       <p id="ghiChu">Ghi chú: [GHI CHÚ]</p>
     </div>
+
+    <!-- Bảng chi tiết sản phẩm -->
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
@@ -68,6 +95,11 @@
         <th id="ckHeader">CK</th>
         <th>T.TIỀN</th>
       </tr>
+    </table>
+
+    <!-- Phần tổng kết - dễ nhìn hơn -->
+    <table class="summary-table" id="summaryTable">
+      <!-- Nội dung sẽ được JS thêm vào -->
     </table>
   </div>
 
@@ -93,46 +125,41 @@
 
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
-    const tenKhachValue = decodeURIComponent(tenKhach).trim();
-    if (tenKhachValue) document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
+    if (tenKhach) document.getElementById('tenKhach').textContent = `Khách hàng: ${decodeURIComponent(tenKhach)}`;
     else document.getElementById('tenKhach').style.display = 'none';
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
-    if (ghiChuValue) {
-      document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
-    } else {
-      document.getElementById('ghiChu').style.display = 'none';
-    }
+    if (ghiChuValue) document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
+    else document.getElementById('ghiChu').style.display = 'none';
 
-    const table = document.getElementById('invoiceTable');
+    const detailTable = document.getElementById('invoiceTable');
+    const summaryTable = document.getElementById('summaryTable');
     let tongGia = 0;
     let hasAnyCK = false;
     let hasProduct = false;
 
-    // Xử lý sản phẩm
+    // Xử lý chi tiết sản phẩm
     if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
       let detailRows = [];
 
       rowsData.forEach(record => {
         if (!record.trim()) return;
-
         const items = record.split('_a_');
         if (items.length < 4) return;
 
         const sanPham = items[0].replace(/_/g, ',').trim();
         const soLuong = items[1];
 
-        let donGia, thanhTien, ckRaw;
+        let donGia, thanhTien, ckRaw = '0';
 
         if (items.length >= 5) {
           ckRaw = items[2] || '0';
           donGia = parseInt(items[3].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
         } else {
-          ckRaw = '0';
           donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
         }
@@ -145,99 +172,77 @@
         hasProduct = true;
       });
 
-      // Sắp xếp theo tên sản phẩm A → Z
-      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
+      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi'));
 
-      // Thêm vào bảng
       detailRows.forEach(item => {
-        const row = table.insertRow();
+        const row = detailTable.insertRow();
         row.insertCell(0).textContent = item.sanPham;
         row.insertCell(1).textContent = item.soLuong;
         row.insertCell(2).textContent = item.donGia.toLocaleString();
-
-        // Cột CK - Chỉ hiển thị khi có CK > 0
         const ckCell = row.insertCell(3);
         ckCell.textContent = (item.ckPercent > 0) ? item.ckPercent.toFixed(0) + '%' : '';
-
         row.insertCell(4).textContent = item.thanhTien.toLocaleString();
       });
     }
 
-    // Ẩn hoàn toàn cột CK nếu không có chiết khấu nào trong toàn đơn
-    const ckHeader = document.getElementById('ckHeader');
     if (!hasAnyCK) {
-      ckHeader.style.display = 'none';
-      const ckCells = table.querySelectorAll('td:nth-child(4)');
+      document.getElementById('ckHeader').style.display = 'none';
+      const ckCells = detailTable.querySelectorAll('td:nth-child(4)');
       ckCells.forEach(cell => cell.style.display = 'none');
     }
 
-    const colSpanValue = hasAnyCK ? 4 : 3;
+    // ==================== PHẦN TỔNG KẾT - DỄ NHÌN HƠN ====================
+    let summaryHTML = '';
 
-    // Tổng tiền hàng (chỉ hiện nếu có sản phẩm)
     if (hasProduct && tongGia > 0) {
-      const totalRow = table.insertRow();
-      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng tiền hàng:</td>`;
-      const totalCell = totalRow.insertCell(1);
-      totalCell.colSpan = colSpanValue;
-      totalCell.style.fontWeight = 'bold';
-      totalCell.style.textAlign = 'right';
-      totalCell.style.paddingRight = '5px';
-      totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
+      summaryHTML += `
+        <tr>
+          <td class="summary-label">Tổng tiền hàng:</td>
+          <td class="summary-value">${tongGia.toLocaleString()} VNĐ</td>
+        </tr>`;
     }
 
-    // Sau CK
     const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
     if (hasAnyCK && sauCKValue > 0) {
-      const sauRow = table.insertRow();
-      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
-      const sauCell = sauRow.insertCell(1);
-      sauCell.colSpan = colSpanValue;
-      sauCell.style.fontWeight = 'bold';
-      sauCell.style.textAlign = 'right';
-      sauCell.style.paddingRight = '5px';
-      sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+      summaryHTML += `
+        <tr>
+          <td class="summary-label">Sau CK:</td>
+          <td class="summary-value">${sauCKValue.toLocaleString()} VNĐ</td>
+        </tr>`;
     }
 
-    // Đơn cũ còn
     const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
     if (donCuConValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
+      summaryHTML += `
+        <tr>
+          <td class="summary-label">Đơn cũ còn:</td>
+          <td class="summary-value">${donCuConValue.toLocaleString()} VNĐ</td>
+        </tr>`;
     }
 
-    // Khách trả
     const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
     if (khachTraValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
+      summaryHTML += `
+        <tr>
+          <td class="summary-label">Khách trả:</td>
+          <td class="summary-value">${khachTraValue.toLocaleString()} VNĐ</td>
+        </tr>`;
     }
 
-    // Tổng cộng còn
     const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
     if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
+      summaryHTML += `
+        <tr class="total-line">
+          <td class="summary-label">Tổng cộng còn:</td>
+          <td class="summary-value">${tongCongValue.toLocaleString()} VNĐ</td>
+        </tr>`;
     }
 
-    // Share functions
+    if (summaryHTML) {
+      summaryTable.innerHTML = summaryHTML;
+    }
+
+    // Share functions giữ nguyên
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
