@@ -7,12 +7,7 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .invoice { width: 100%; margin: 0; padding: 5px; }
-    .header {
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+    .header { text-align: center; font-size: 30px; font-weight: bold; margin-bottom: 10px; }
     .info p { margin: 5px 0; font-size: 20px; }
     table {
       width: 100%;
@@ -28,15 +23,9 @@
     th { font-weight: bold; text-align: center; }
     
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:not(:nth-child(1)) {
-      text-align: right;
-      padding-right: 5px;
-    }
-
-    .button-container {
-      margin: 10px;
-      text-align: center;
-    }
+    #invoiceTable td:not(:nth-child(1)) { text-align: right; padding-right: 5px; }
+    
+    .button-container { margin: 10px; text-align: center; }
     button {
       font-size: 20px;
       padding: 10px 20px;
@@ -91,7 +80,6 @@
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
-    // Set tiêu đề & thông tin cơ bản
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
@@ -110,7 +98,7 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // Xử lý bảng chi tiết
+    // ==================== XỬ LÝ BẢNG CHI TIẾT ====================
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
@@ -119,40 +107,44 @@
 
       rows.forEach(record => {
         if (!record.trim()) return;
-        
+
         const items = record.split('_a_');
-        if (items.length < 5) return;
+        if (items.length < 4) return;   // Ít nhất phải có 4 phần
 
         const sanPham = items[0].replace(/_/g, ',');
         const soLuong = items[1];
-        const ckRaw = items[2] || '0';           // CK dạng số thập phân (0.25 = 25%)
-        const donGia = parseInt(items[3].replace(/,/g, '')) || 0;
-        const thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
+        const donGia = parseInt(items[items.length === 4 ? 2 : 3].replace(/,/g, '')) || 0;
+        const thanhTien = parseInt(items[items.length === 4 ? 3 : 4].replace(/,/g, '')) || 0;
 
-        const ckPercent = parseFloat(ckRaw) * 100;
+        let ckPercent = 0;
+        if (items.length >= 5) {
+          // Dòng mới có CK
+          ckPercent = parseFloat(items[2]) * 100 || 0;
+        }
+
         if (ckPercent > 0) hasAnyCK = true;
 
+        // Tạo dòng
         const row = table.insertRow();
         row.insertCell(0).textContent = sanPham;
         row.insertCell(1).textContent = soLuong;
         row.insertCell(2).textContent = donGia.toLocaleString();
 
-        // Cột CK hiển thị dạng %
+        // Cột CK
         const ckCell = row.insertCell(3);
-        ckCell.textContent = ckPercent > 0 ? ckPercent.toFixed(0) + '%' : '0%';
+        ckCell.textContent = (ckPercent > 0) ? ckPercent.toFixed(0) + '%' : '0%';
 
         row.insertCell(4).textContent = thanhTien.toLocaleString();
 
         tongGia += thanhTien;
       });
 
-      // Ẩn cột CK nếu không có chiết khấu nào
+      // Ẩn cột CK nếu không có đơn nào có chiết khấu
       const ckHeader = document.getElementById('ckHeader');
-      ckHeader.style.display = hasAnyCK ? 'table-cell' : 'none';
-
       if (!hasAnyCK) {
-        const allCKCells = table.querySelectorAll('tr td:nth-child(4)');
-        allCKCells.forEach(cell => cell.style.display = 'none');
+        ckHeader.style.display = 'none';
+        const ckCells = table.querySelectorAll('td:nth-child(4)');
+        ckCells.forEach(cell => cell.style.display = 'none');
       }
 
       // ==================== DÒNG TỔNG TIỀN HÀNG ====================
@@ -167,7 +159,7 @@
       totalValueCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
       // ==================== DÒNG SAU CK ====================
-      const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g,'')) || 0;
+      const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
       if (hasAnyCK && sauCKValue > 0) {
         const sauRow = table.insertRow();
         sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
@@ -180,7 +172,7 @@
         sauValueCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
       }
 
-      // ==================== ĐƠN CŨ - KHÁCH TRẢ - TỔNG CÒN ====================
+      // ==================== CÁC DÒNG CUỐI ====================
       const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
@@ -220,7 +212,7 @@
       }
     }
 
-    // Share functions (giữ nguyên)
+    // Share functions giữ nguyên
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
@@ -230,9 +222,7 @@
         const canvas = await captureInvoice();
         const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-        }
+        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file] });
       } catch (e) {}
     }
 
@@ -243,17 +233,11 @@
         const { jsPDF } = window.jspdf;
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: [210, Math.max(imgHeight + 20, 297)]
-        });
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
         const pdfBlob = pdf.output('blob');
         const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share({ files: [pdfFile] });
-        }
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) await navigator.share({ files: [pdfFile] });
       } catch (e) {}
     }
 
