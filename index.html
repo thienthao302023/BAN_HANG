@@ -7,7 +7,12 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .invoice { width: 100%; margin: 0; padding: 5px; }
-    .header { text-align: center; font-size: 30px; font-weight: bold; margin-bottom: 10px; }
+    .header { 
+      text-align: center; 
+      font-size: 30px; 
+      font-weight: bold; 
+      margin-bottom: 10px; 
+    }
     .info p { margin: 5px 0; font-size: 20px; }
     table {
       width: 100%;
@@ -23,9 +28,15 @@
     th { font-weight: bold; text-align: center; }
     
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:not(:nth-child(1)) { text-align: right; padding-right: 5px; }
-    
-    .button-container { margin: 10px; text-align: center; }
+    #invoiceTable td:not(:nth-child(1)) { 
+      text-align: right; 
+      padding-right: 5px; 
+    }
+
+    .button-container { 
+      margin: 10px; 
+      text-align: center; 
+    }
     button {
       font-size: 20px;
       padding: 10px 20px;
@@ -98,48 +109,68 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // ==================== XỬ LÝ BẢNG CHI TIẾT ====================
+    // ==================== XỬ LÝ BẢNG CHI TIẾT + SẮP XẾP ====================
     if (data) {
-      const rows = decodeURIComponent(data).split('_b_');
+      const rowsData = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
       let hasAnyCK = false;
+      let detailRows = [];
 
-      rows.forEach(record => {
+      rowsData.forEach(record => {
         if (!record.trim()) return;
 
         const items = record.split('_a_');
-        if (items.length < 4) return;   // Ít nhất phải có 4 phần
+        if (items.length < 4) return;
 
-        const sanPham = items[0].replace(/_/g, ',');
+        const sanPham = items[0].replace(/_/g, ',').trim();
         const soLuong = items[1];
-        const donGia = parseInt(items[items.length === 4 ? 2 : 3].replace(/,/g, '')) || 0;
-        const thanhTien = parseInt(items[items.length === 4 ? 3 : 4].replace(/,/g, '')) || 0;
-
-        let ckPercent = 0;
+        
+        let donGia, thanhTien, ckRaw;
+        
         if (items.length >= 5) {
-          // Dòng mới có CK
-          ckPercent = parseFloat(items[2]) * 100 || 0;
+          // Format mới: Sản phẩm _a_ SL _a_ CK _a_ Đơn giá _a_ Thành tiền
+          ckRaw = items[2] || '0';
+          donGia = parseInt(items[3].replace(/,/g, '')) || 0;
+          thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
+        } else {
+          // Format cũ: Sản phẩm _a_ SL _a_ Đơn giá _a_ Thành tiền
+          ckRaw = '0';
+          donGia = parseInt(items[2].replace(/,/g, '')) || 0;
+          thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
         }
 
+        const ckPercent = parseFloat(ckRaw) * 100 || 0;
         if (ckPercent > 0) hasAnyCK = true;
 
-        // Tạo dòng
-        const row = table.insertRow();
-        row.insertCell(0).textContent = sanPham;
-        row.insertCell(1).textContent = soLuong;
-        row.insertCell(2).textContent = donGia.toLocaleString();
-
-        // Cột CK
-        const ckCell = row.insertCell(3);
-        ckCell.textContent = (ckPercent > 0) ? ckPercent.toFixed(0) + '%' : '0%';
-
-        row.insertCell(4).textContent = thanhTien.toLocaleString();
+        detailRows.push({
+          sanPham: sanPham,
+          soLuong: soLuong,
+          donGia: donGia,
+          ckPercent: ckPercent,
+          thanhTien: thanhTien
+        });
 
         tongGia += thanhTien;
       });
 
-      // Ẩn cột CK nếu không có đơn nào có chiết khấu
+      // === SẮP XẾP THEO TÊN SẢN PHẨM (A → Z) ===
+      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
+
+      // Thêm các dòng đã sắp xếp vào bảng
+      detailRows.forEach(item => {
+        const row = table.insertRow();
+        row.insertCell(0).textContent = item.sanPham;
+        row.insertCell(1).textContent = item.soLuong;
+        row.insertCell(2).textContent = item.donGia.toLocaleString();
+
+        const ckCell = row.insertCell(3);
+        ckCell.textContent = (item.ckPercent > 0) ? item.ckPercent.toFixed(0) + '%' : '0%';
+
+        row.insertCell(4).textContent = item.thanhTien.toLocaleString();
+      });
+
+      // Ẩn cột CK nếu không có chiết khấu
       const ckHeader = document.getElementById('ckHeader');
       if (!hasAnyCK) {
         ckHeader.style.display = 'none';
@@ -147,36 +178,36 @@
         ckCells.forEach(cell => cell.style.display = 'none');
       }
 
-      // ==================== DÒNG TỔNG TIỀN HÀNG ====================
+      // ==================== CÁC DÒNG TỔNG ====================
+      const colSpanValue = hasAnyCK ? 4 : 3;
+
+      // Tổng tiền hàng
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng tiền hàng:</td>`;
-      
-      const totalValueCell = totalRow.insertCell(1);
-      totalValueCell.colSpan = hasAnyCK ? 4 : 3;
-      totalValueCell.style.fontWeight = 'bold';
-      totalValueCell.style.textAlign = 'right';
-      totalValueCell.style.paddingRight = '5px';
-      totalValueCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
+      const totalCell = totalRow.insertCell(1);
+      totalCell.colSpan = colSpanValue;
+      totalCell.style.fontWeight = 'bold';
+      totalCell.style.textAlign = 'right';
+      totalCell.style.paddingRight = '5px';
+      totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
-      // ==================== DÒNG SAU CK ====================
+      // Sau CK
       const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
       if (hasAnyCK && sauCKValue > 0) {
         const sauRow = table.insertRow();
         sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
-        
-        const sauValueCell = sauRow.insertCell(1);
-        sauValueCell.colSpan = hasAnyCK ? 4 : 3;
-        sauValueCell.style.fontWeight = 'bold';
-        sauValueCell.style.textAlign = 'right';
-        sauValueCell.style.paddingRight = '5px';
-        sauValueCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+        const sauCell = sauRow.insertCell(1);
+        sauCell.colSpan = colSpanValue;
+        sauCell.style.fontWeight = 'bold';
+        sauCell.style.textAlign = 'right';
+        sauCell.style.paddingRight = '5px';
+        sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
       }
 
-      // ==================== CÁC DÒNG CUỐI ====================
+      // Đơn cũ còn, Khách trả, Tổng cộng còn
       const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
-      const colSpanValue = hasAnyCK ? 4 : 3;
 
       if (donCuConValue !== 0) {
         const row = table.insertRow();
@@ -212,7 +243,7 @@
       }
     }
 
-    // Share functions giữ nguyên
+    // Share functions (giữ nguyên)
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
