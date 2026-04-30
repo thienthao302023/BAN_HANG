@@ -28,9 +28,9 @@
     th { font-weight: bold; text-align: center; }
     
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:not(:nth-child(1)) { 
-      text-align: right; 
-      padding-right: 5px; 
+    #invoiceTable td:not(:nth-child(1)) {
+      text-align: right;
+      padding-right: 5px;
     }
 
     .button-container {
@@ -64,8 +64,8 @@
       <tr>
         <th>SẢN PHẨM</th>
         <th>SL</th>
-        <th id="ckHeader">CK</th>
         <th>Đ.GIÁ</th>
+        <th id="ckHeader">CK</th>
         <th>T.TIỀN</th>
       </tr>
     </table>
@@ -80,7 +80,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    
+   
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '';
     const donCuCon = urlParams.get('doncucon') || '0';
@@ -91,10 +91,9 @@
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
-    // Set tiêu đề
+    // Set tiêu đề & thông tin cơ bản
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
-    // Khách hàng
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
     if (tenKhachValue) {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
@@ -104,7 +103,6 @@
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-    // Ghi chú
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue) {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
@@ -112,7 +110,7 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // Xử lý dữ liệu chi tiết
+    // Xử lý bảng chi tiết
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
@@ -127,37 +125,40 @@
 
         const sanPham = items[0].replace(/_/g, ',');
         const soLuong = items[1];
-        const ck = items[2] || '0';
+        const ckRaw = items[2] || '0';           // CK dạng số thập phân (0.25 = 25%)
         const donGia = parseInt(items[3].replace(/,/g, '')) || 0;
         const thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
 
-        if (parseFloat(ck) > 0) hasAnyCK = true;
+        const ckPercent = parseFloat(ckRaw) * 100;
+        if (ckPercent > 0) hasAnyCK = true;
 
         const row = table.insertRow();
         row.insertCell(0).textContent = sanPham;
         row.insertCell(1).textContent = soLuong;
-        
-        const ckCell = row.insertCell(2);
-        ckCell.textContent = ck;
-        
-        row.insertCell(3).textContent = donGia.toLocaleString();
+        row.insertCell(2).textContent = donGia.toLocaleString();
+
+        // Cột CK hiển thị dạng %
+        const ckCell = row.insertCell(3);
+        ckCell.textContent = ckPercent > 0 ? ckPercent.toFixed(0) + '%' : '0%';
+
         row.insertCell(4).textContent = thanhTien.toLocaleString();
 
         tongGia += thanhTien;
       });
 
-      // Ẩn cột CK nếu không có CK nào
+      // Ẩn cột CK nếu không có chiết khấu nào
       const ckHeader = document.getElementById('ckHeader');
       ckHeader.style.display = hasAnyCK ? 'table-cell' : 'none';
 
       if (!hasAnyCK) {
-        const allCKCells = table.querySelectorAll('tr td:nth-child(3)');
+        const allCKCells = table.querySelectorAll('tr td:nth-child(4)');
         allCKCells.forEach(cell => cell.style.display = 'none');
       }
 
-      // Dòng Tổng tiền hàng
+      // ==================== DÒNG TỔNG TIỀN HÀNG ====================
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng tiền hàng:</td>`;
+      
       const totalValueCell = totalRow.insertCell(1);
       totalValueCell.colSpan = hasAnyCK ? 4 : 3;
       totalValueCell.style.fontWeight = 'bold';
@@ -165,11 +166,12 @@
       totalValueCell.style.paddingRight = '5px';
       totalValueCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
-      // Dòng Sau CK (chỉ hiện nếu có CK)
+      // ==================== DÒNG SAU CK ====================
       const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g,'')) || 0;
       if (hasAnyCK && sauCKValue > 0) {
         const sauRow = table.insertRow();
         sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
+        
         const sauValueCell = sauRow.insertCell(1);
         sauValueCell.colSpan = hasAnyCK ? 4 : 3;
         sauValueCell.style.fontWeight = 'bold';
@@ -178,11 +180,10 @@
         sauValueCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
       }
 
-      // Đơn cũ còn, Khách trả, Tổng cộng còn
+      // ==================== ĐƠN CŨ - KHÁCH TRẢ - TỔNG CÒN ====================
       const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
-
       const colSpanValue = hasAnyCK ? 4 : 3;
 
       if (donCuConValue !== 0) {
@@ -219,7 +220,7 @@
       }
     }
 
-    // Share functions
+    // Share functions (giữ nguyên)
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
@@ -242,10 +243,10 @@
         const { jsPDF } = window.jspdf;
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pdf = new jsPDF({ 
-          orientation: 'portrait', 
-          unit: 'mm', 
-          format: [210, Math.max(imgHeight + 20, 297)] 
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [210, Math.max(imgHeight + 20, 297)]
         });
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
         const pdfBlob = pdf.output('blob');
