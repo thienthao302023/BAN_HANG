@@ -43,14 +43,14 @@
       font-weight: bold;
       text-align: center;
     }
-    #invoiceTable th:nth-child(1), #invoiceTable td:nth-child(1) { width: 65%; }
-    #invoiceTable th:nth-child(2), #invoiceTable td:nth-child(2) { width: 5%; }
-    #invoiceTable th:nth-child(3), #invoiceTable td:nth-child(3) { width: 15%; }
-    #invoiceTable th:nth-child(4), #invoiceTable td:nth-child(4) { width: 15%; }
     #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
     #invoiceTable td:nth-child(2),
     #invoiceTable td:nth-child(3),
-    #invoiceTable td:nth-child(4) { text-align: right; padding-right: 5px; }
+    #invoiceTable td:nth-child(4),
+    #invoiceTable td:nth-child(5) { 
+      text-align: right; 
+      padding-right: 5px; 
+    }
 
     .button-container {
       margin: 10px;
@@ -65,13 +65,9 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    #shareBtn {
-      background-color: #673ab7;
-    }
+    #shareBtn { background-color: #673ab7; }
     #shareBtn:hover { background-color: #512da8; }
-    #sharePdfBtn {
-      background-color: #e91e63;
-    }
+    #sharePdfBtn { background-color: #e91e63; }
     #sharePdfBtn:hover { background-color: #c2185b; }
   </style>
 </head>
@@ -87,6 +83,7 @@
       <tr>
         <th>SẢN PHẨM</th>
         <th>SL</th>
+        <th id="ckHeader" style="display: none;">CK</th>
         <th>Đ.GIÁ</th>
         <th>T.TIỀN</th>
       </tr>
@@ -100,20 +97,22 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <script>
     const urlParams = new URLSearchParams(window.location.search);
+    
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '[KHÁCH HÀNG]';
     const donCuCon = urlParams.get('doncucon') || '0';
     const khachTra = urlParams.get('khachtra') || '0';
     const tongCong = urlParams.get('tongcong') || '0';
+    const sauCK = urlParams.get('sauck') || '0';        // <-- Giá trị [TB]
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
+    // Khách hàng
     const tenKhachValue = decodeURIComponent(tenKhach);
     if (tenKhachValue && tenKhachValue !== '[KHÁCH HÀNG]') {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
@@ -123,6 +122,7 @@
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
+    // Ghi chú
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue !== '') {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
@@ -130,24 +130,49 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
+    // Xử lý bảng chi tiết
     if (data) {
       const rows = decodeURIComponent(data).split('_b_');
       const table = document.getElementById('invoiceTable');
       let tongGia = 0;
+      let hasCK = false;                    // Kiểm tra có CK nào không
+
       rows.forEach(record => {
         const items = record.split('_a_');
-        if (items.length >= 4) {
+        if (items.length >= 5) {
+          const sanPham = items[0].replace(/_/g, ',');
+          const soLuong = items[1];
+          const ck = items[2];                    // CK mới
+          const donGia = parseInt(items[3].replace(/,/g, '')) || 0;
+          const thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
+
+          if (parseInt(ck) > 0) hasCK = true;
+
           const row = table.insertRow();
-          row.insertCell(0).textContent = items[0].replace(/_/g, ',');
-          row.insertCell(1).textContent = items[1];
-          const donGia = parseInt(items[2].replace(/,/g, '')) || 0;
-          const thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
-          row.insertCell(2).textContent = donGia.toLocaleString();
-          row.insertCell(3).textContent = thanhTien.toLocaleString();
+          row.insertCell(0).textContent = sanPham;
+          row.insertCell(1).textContent = soLuong;
+
+          const ckCell = row.insertCell(2);
+          ckCell.textContent = ck;
+          if (!hasCK) ckCell.style.display = 'none';   // tạm ẩn nếu chưa biết có CK
+
+          row.insertCell(3).textContent = donGia.toLocaleString();
+          row.insertCell(4).textContent = thanhTien.toLocaleString();
+
           tongGia += thanhTien;
         }
       });
 
+      // Hiển thị hoặc ẩn cột CK
+      document.getElementById('ckHeader').style.display = hasCK ? 'table-cell' : 'none';
+
+      // Cập nhật lại tất cả các ô CK (nếu không có CK thì ẩn hết)
+      if (!hasCK) {
+        const ckCells = table.querySelectorAll('td:nth-child(3)');
+        ckCells.forEach(cell => cell.style.display = 'none');
+      }
+
+      // ==================== DÒNG TỔNG TIỀN HÀNG ====================
       const totalRow = table.insertRow();
       const totalCell1 = totalRow.insertCell(0);
       totalCell1.colSpan = 1;
@@ -155,13 +180,34 @@
       totalCell1.style.textAlign = 'right';
       totalCell1.style.paddingLeft = '5px';
       totalCell1.textContent = `Tổng tiền hàng:`;
+
       const totalCell2 = totalRow.insertCell(1);
-      totalCell2.colSpan = 3;
+      totalCell2.colSpan = hasCK ? 4 : 3;
       totalCell2.style.fontWeight = 'bold';
       totalCell2.style.textAlign = 'right';
       totalCell2.style.paddingRight = '5px';
       totalCell2.textContent = `${tongGia.toLocaleString()} VNĐ`;
 
+      // ==================== DÒNG SAU CK (nếu có) ====================
+      const sauCKValue = parseInt(decodeURIComponent(sauCK)) || 0;
+      if (hasCK && sauCKValue > 0) {
+        const sauCKRow = table.insertRow();
+        const sauCKCell1 = sauCKRow.insertCell(0);
+        sauCKCell1.colSpan = 1;
+        sauCKCell1.style.fontWeight = 'bold';
+        sauCKCell1.style.textAlign = 'right';
+        sauCKCell1.style.paddingLeft = '5px';
+        sauCKCell1.textContent = `Sau CK:`;
+
+        const sauCKCell2 = sauCKRow.insertCell(1);
+        sauCKCell2.colSpan = hasCK ? 4 : 3;
+        sauCKCell2.style.fontWeight = 'bold';
+        sauCKCell2.style.textAlign = 'right';
+        sauCKCell2.style.paddingRight = '5px';
+        sauCKCell2.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+      }
+
+      // ==================== ĐƠN CŨ CÒN - KHÁCH TRẢ - TỔNG CÒN ====================
       const donCuConValue = parseInt(decodeURIComponent(donCuCon)) || 0;
       const khachTraValue = parseInt(decodeURIComponent(khachTra)) || 0;
       const tongCongValue = parseInt(decodeURIComponent(tongCong)) || 0;
@@ -169,34 +215,56 @@
       if (donCuConValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; cell1.style.fontWeight = 'bold'; cell1.style.textAlign = 'right'; cell1.style.paddingLeft = '5px';
+        cell1.colSpan = 1; 
+        cell1.style.fontWeight = 'bold'; 
+        cell1.style.textAlign = 'right'; 
+        cell1.style.paddingLeft = '5px';
         cell1.textContent = 'Đơn cũ còn:';
+
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 3; cell2.style.fontWeight = 'bold'; cell2.style.textAlign = 'right'; cell2.style.paddingRight = '5px';
+        cell2.colSpan = hasCK ? 4 : 3;
+        cell2.style.fontWeight = 'bold'; 
+        cell2.style.textAlign = 'right'; 
+        cell2.style.paddingRight = '5px';
         cell2.textContent = donCuConValue.toLocaleString() + ' VNĐ';
       }
 
       if (khachTraValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; cell1.style.fontWeight = 'bold'; cell1.style.textAlign = 'right'; cell1.style.paddingLeft = '5px';
+        cell1.colSpan = 1; 
+        cell1.style.fontWeight = 'bold'; 
+        cell1.style.textAlign = 'right'; 
+        cell1.style.paddingLeft = '5px';
         cell1.textContent = 'Khách trả:';
+
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 3; cell2.style.fontWeight = 'bold'; cell2.style.textAlign = 'right'; cell2.style.paddingRight = '5px';
+        cell2.colSpan = hasCK ? 4 : 3;
+        cell2.style.fontWeight = 'bold'; 
+        cell2.style.textAlign = 'right'; 
+        cell2.style.paddingRight = '5px';
         cell2.textContent = khachTraValue.toLocaleString() + ' VNĐ';
       }
 
       if (donCuConValue !== 0 || khachTraValue !== 0) {
         const row = table.insertRow();
         const cell1 = row.insertCell(0);
-        cell1.colSpan = 1; cell1.style.fontWeight = 'bold'; cell1.style.textAlign = 'right'; cell1.style.paddingLeft = '5px';
+        cell1.colSpan = 1; 
+        cell1.style.fontWeight = 'bold'; 
+        cell1.style.textAlign = 'right'; 
+        cell1.style.paddingLeft = '5px';
         cell1.textContent = 'Tổng cộng còn:';
+
         const cell2 = row.insertCell(1);
-        cell2.colSpan = 3; cell2.style.fontWeight = 'bold'; cell2.style.textAlign = 'right'; cell2.style.paddingRight = '5px';
+        cell2.colSpan = hasCK ? 4 : 3;
+        cell2.style.fontWeight = 'bold'; 
+        cell2.style.textAlign = 'right'; 
+        cell2.style.paddingRight = '5px';
         cell2.textContent = tongCongValue.toLocaleString() + ' VNĐ';
       }
     }
 
+    // Các hàm chia sẻ (giữ nguyên)
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), {
         scale: 3,
@@ -210,13 +278,10 @@
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         if (!blob) return;
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file] });
         }
-      } catch (err) {
-        // im lặng, không báo lỗi
-      }
+      } catch (err) {}
     }
 
     async function shareInvoiceAsPdf() {
@@ -230,17 +295,13 @@
         const pageHeight = Math.max(imgHeight + 20, 297);
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pageWidth, pageHeight] });
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-
         const pdfBlob = pdf.output('blob');
         const fileName = `hoa_don_${maDonHang || new Date().toISOString().slice(0,10)}.pdf`;
         const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
         if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
           await navigator.share({ files: [pdfFile] });
         }
-      } catch (err) {
-        // im lặng, không báo lỗi
-      }
+      } catch (err) {}
     }
 
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
