@@ -94,11 +94,8 @@
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
-    if (tenKhachValue) {
-      document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
-    } else {
-      document.getElementById('tenKhach').style.display = 'none';
-    }
+    if (tenKhachValue) document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
+    else document.getElementById('tenKhach').style.display = 'none';
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
@@ -114,10 +111,9 @@
     let hasAnyCK = false;
     let hasProduct = false;
 
-    // ==================== XỬ LÝ SẢN PHẨM (nếu có) ====================
+    // Xử lý sản phẩm
     if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
-      
       let detailRows = [];
 
       rowsData.forEach(record => {
@@ -159,14 +155,15 @@
         row.insertCell(1).textContent = item.soLuong;
         row.insertCell(2).textContent = item.donGia.toLocaleString();
 
+        // Cột CK - Chỉ hiển thị khi có CK > 0
         const ckCell = row.insertCell(3);
-        ckCell.textContent = (item.ckPercent > 0) ? item.ckPercent.toFixed(0) + '%' : '0%';
+        ckCell.textContent = (item.ckPercent > 0) ? item.ckPercent.toFixed(0) + '%' : '';
 
         row.insertCell(4).textContent = item.thanhTien.toLocaleString();
       });
     }
 
-    // Ẩn cột CK nếu không có chiết khấu
+    // Ẩn hoàn toàn cột CK nếu không có chiết khấu nào trong toàn đơn
     const ckHeader = document.getElementById('ckHeader');
     if (!hasAnyCK) {
       ckHeader.style.display = 'none';
@@ -175,8 +172,6 @@
     }
 
     const colSpanValue = hasAnyCK ? 4 : 3;
-
-    // ==================== DÒNG TỔNG (luôn hiển thị nếu có giá trị) ====================
 
     // Tổng tiền hàng (chỉ hiện nếu có sản phẩm)
     if (hasProduct && tongGia > 0) {
@@ -190,7 +185,7 @@
       totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
     }
 
-    // Sau CK (chỉ hiện nếu có CK và có giá trị)
+    // Sau CK
     const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
     if (hasAnyCK && sauCKValue > 0) {
       const sauRow = table.insertRow();
@@ -242,9 +237,7 @@
       cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
     }
 
-    // Nếu bảng hoàn toàn trống (không có gì cả) thì có thể thêm thông báo, nhưng hiện tại giữ nguyên theo yêu cầu
-
-    // ==================== SHARE FUNCTIONS ====================
+    // Share functions
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
