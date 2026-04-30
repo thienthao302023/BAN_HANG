@@ -109,12 +109,15 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
-    // ==================== XỬ LÝ BẢNG CHI TIẾT + SẮP XẾP ====================
-    if (data) {
+    const table = document.getElementById('invoiceTable');
+    let tongGia = 0;
+    let hasAnyCK = false;
+    let hasProduct = false;
+
+    // ==================== XỬ LÝ SẢN PHẨM (nếu có) ====================
+    if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
-      const table = document.getElementById('invoiceTable');
-      let tongGia = 0;
-      let hasAnyCK = false;
+      
       let detailRows = [];
 
       rowsData.forEach(record => {
@@ -125,16 +128,14 @@
 
         const sanPham = items[0].replace(/_/g, ',').trim();
         const soLuong = items[1];
-        
+
         let donGia, thanhTien, ckRaw;
-        
+
         if (items.length >= 5) {
-          // Format mới: Sản phẩm _a_ SL _a_ CK _a_ Đơn giá _a_ Thành tiền
           ckRaw = items[2] || '0';
           donGia = parseInt(items[3].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
         } else {
-          // Format cũ: Sản phẩm _a_ SL _a_ Đơn giá _a_ Thành tiền
           ckRaw = '0';
           donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
@@ -143,21 +144,15 @@
         const ckPercent = parseFloat(ckRaw) * 100 || 0;
         if (ckPercent > 0) hasAnyCK = true;
 
-        detailRows.push({
-          sanPham: sanPham,
-          soLuong: soLuong,
-          donGia: donGia,
-          ckPercent: ckPercent,
-          thanhTien: thanhTien
-        });
-
+        detailRows.push({ sanPham, soLuong, donGia, ckPercent, thanhTien });
         tongGia += thanhTien;
+        hasProduct = true;
       });
 
-      // === SẮP XẾP THEO TÊN SẢN PHẨM (A → Z) ===
+      // Sắp xếp theo tên sản phẩm A → Z
       detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
 
-      // Thêm các dòng đã sắp xếp vào bảng
+      // Thêm vào bảng
       detailRows.forEach(item => {
         const row = table.insertRow();
         row.insertCell(0).textContent = item.sanPham;
@@ -169,19 +164,22 @@
 
         row.insertCell(4).textContent = item.thanhTien.toLocaleString();
       });
+    }
 
-      // Ẩn cột CK nếu không có chiết khấu
-      const ckHeader = document.getElementById('ckHeader');
-      if (!hasAnyCK) {
-        ckHeader.style.display = 'none';
-        const ckCells = table.querySelectorAll('td:nth-child(4)');
-        ckCells.forEach(cell => cell.style.display = 'none');
-      }
+    // Ẩn cột CK nếu không có chiết khấu
+    const ckHeader = document.getElementById('ckHeader');
+    if (!hasAnyCK) {
+      ckHeader.style.display = 'none';
+      const ckCells = table.querySelectorAll('td:nth-child(4)');
+      ckCells.forEach(cell => cell.style.display = 'none');
+    }
 
-      // ==================== CÁC DÒNG TỔNG ====================
-      const colSpanValue = hasAnyCK ? 4 : 3;
+    const colSpanValue = hasAnyCK ? 4 : 3;
 
-      // Tổng tiền hàng
+    // ==================== DÒNG TỔNG (luôn hiển thị nếu có giá trị) ====================
+
+    // Tổng tiền hàng (chỉ hiện nếu có sản phẩm)
+    if (hasProduct && tongGia > 0) {
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng tiền hàng:</td>`;
       const totalCell = totalRow.insertCell(1);
@@ -190,60 +188,63 @@
       totalCell.style.textAlign = 'right';
       totalCell.style.paddingRight = '5px';
       totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
-
-      // Sau CK
-      const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
-      if (hasAnyCK && sauCKValue > 0) {
-        const sauRow = table.insertRow();
-        sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
-        const sauCell = sauRow.insertCell(1);
-        sauCell.colSpan = colSpanValue;
-        sauCell.style.fontWeight = 'bold';
-        sauCell.style.textAlign = 'right';
-        sauCell.style.paddingRight = '5px';
-        sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
-      }
-
-      // Đơn cũ còn, Khách trả, Tổng cộng còn
-      const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
-      const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
-      const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
-
-      if (donCuConValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
-        const cell = row.insertCell(1);
-        cell.colSpan = colSpanValue;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
-      }
-
-      if (khachTraValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
-        const cell = row.insertCell(1);
-        cell.colSpan = colSpanValue;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
-      }
-
-      if (donCuConValue !== 0 || khachTraValue !== 0) {
-        const row = table.insertRow();
-        row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
-        const cell = row.insertCell(1);
-        cell.colSpan = colSpanValue;
-        cell.style.fontWeight = 'bold';
-        cell.style.textAlign = 'right';
-        cell.style.paddingRight = '5px';
-        cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
-      }
     }
 
-    // Share functions (giữ nguyên)
+    // Sau CK (chỉ hiện nếu có CK và có giá trị)
+    const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
+    if (hasAnyCK && sauCKValue > 0) {
+      const sauRow = table.insertRow();
+      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
+      const sauCell = sauRow.insertCell(1);
+      sauCell.colSpan = colSpanValue;
+      sauCell.style.fontWeight = 'bold';
+      sauCell.style.textAlign = 'right';
+      sauCell.style.paddingRight = '5px';
+      sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+    }
+
+    // Đơn cũ còn
+    const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
+    if (donCuConValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
+    }
+
+    // Khách trả
+    const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
+    if (khachTraValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
+    }
+
+    // Tổng cộng còn
+    const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
+    if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
+    }
+
+    // Nếu bảng hoàn toàn trống (không có gì cả) thì có thể thêm thông báo, nhưng hiện tại giữ nguyên theo yêu cầu
+
+    // ==================== SHARE FUNCTIONS ====================
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
