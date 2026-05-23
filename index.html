@@ -2,63 +2,116 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .invoice { width: 100%; margin: 0; padding: 5px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: #f8f8f8;
+    }
+    
+    .invoice { 
+      width: 100%; 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 10px; 
+      background: white;
+    }
+    
     .header {
       text-align: center;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #333;
     }
-    .info p { margin: 5px 0; font-size: 20px; }
+    
+    .info p { 
+      margin: 6px 0; 
+      font-size: 20px; 
+    }
+    
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-size: 20px;
       border: 1px solid #000;
     }
+    
     th, td {
-      padding: 4px;
+      padding: 6px 4px;
       border: 1px solid #000;
     }
-    th { font-weight: bold; text-align: center; }
-   
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
+    
+    th { 
+      font-weight: bold; 
+      text-align: center; 
+      background: #f0f0f0;
+    }
+    
+    #invoiceTable td:nth-child(1) { 
+      text-align: left; 
+      padding-left: 8px; 
+    }
+    
     #invoiceTable td:not(:nth-child(1)) {
       text-align: right;
-      padding-right: 5px;
+      padding-right: 8px;
     }
+
+    /* ==================== PHẦN BUTTON - RẤT QUAN TRỌNG CHO MOBILE ==================== */
     .button-container {
-      margin: 10px;
+      margin: 15px 10px 20px;
       text-align: center;
+      padding: 10px 0;
+      background: white;
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
     }
+    
     button {
       font-size: 20px;
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 14px 28px;
+      margin: 8px;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      min-height: 56px;           /* Dễ bấm hơn trên điện thoại */
+      touch-action: manipulation; /* Rất quan trọng cho mobile */
+      -webkit-tap-highlight-color: rgba(0,0,0,0.1);
     }
-    #shareBtn { background-color: #673ab7; }
-    #shareBtn:hover { background-color: #512da8; }
-    #sharePdfBtn { background-color: #e91e63; }
-    #sharePdfBtn:hover { background-color: #c2185b; }
+    
+    #shareBtn { 
+      background-color: #673ab7; 
+    }
+    #shareBtn:active { 
+      background-color: #512da8; 
+    }
+    
+    #sharePdfBtn { 
+      background-color: #e91e63; 
+    }
+    #sharePdfBtn:active { 
+      background-color: #c2185b; 
+    }
   </style>
 </head>
 <body>
   <div class="invoice" id="invoiceContent">
     <div class="header">HOÁ ĐƠN</div>
+    
     <div class="info">
       <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
       <p id="ngayBan">Ngày bán: [Ngày bán]</p>
       <p id="ghiChu">Ghi chú: [GHI CHÚ]</p>
     </div>
+    
     <table id="invoiceTable">
       <tr>
         <th>SẢN PHẨM</th>
@@ -69,16 +122,21 @@
       </tr>
     </table>
   </div>
+
+  <!-- Nút chia sẻ -->
   <div class="button-container">
-    <button id="shareBtn">Chia sẻ</button>
-    <button id="sharePdfBtn">Chia sẻ PDF</button>
+    <button id="shareBtn">📤 Chia sẻ</button>
+    <button id="sharePdfBtn">📄 Chia sẻ PDF</button>
   </div>
 
+  <!-- Thư viện cần thiết -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script>
+    // ====================== LẤY THÔNG TIN TỪ URL ======================
     const urlParams = new URLSearchParams(window.location.search);
-  
+    
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '';
     const donCuCon = urlParams.get('doncucon') || '0';
@@ -89,11 +147,16 @@
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
+    // Đặt tiêu đề trang
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
+    // ====================== HIỂN THỊ THÔNG TIN KHÁCH HÀNG ======================
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
-    if (tenKhachValue) document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
-    else document.getElementById('tenKhach').style.display = 'none';
+    if (tenKhachValue) {
+      document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
+    } else {
+      document.getElementById('tenKhach').style.display = 'none';
+    }
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
@@ -104,12 +167,12 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
+    // ====================== XỬ LÝ BẢNG SẢN PHẨM ======================
     const table = document.getElementById('invoiceTable');
     let tongGia = 0;
     let hasAnyCK = false;
     let hasProduct = false;
 
-    // Xử lý sản phẩm
     if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
       let detailRows = [];
@@ -141,7 +204,7 @@
         hasProduct = true;
       });
 
-      // Sắp xếp theo tên sản phẩm A → Z
+      // Sắp xếp theo tên sản phẩm
       detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
 
       detailRows.forEach(item => {
@@ -157,26 +220,23 @@
       });
     }
 
-    // Ẩn cột CK nếu không có
-    const ckHeader = document.getElementById('ckHeader');
+    // Ẩn cột CK nếu không có chiết khấu
     if (!hasAnyCK) {
-      ckHeader.style.display = 'none';
+      document.getElementById('ckHeader').style.display = 'none';
       const ckCells = table.querySelectorAll('td:nth-child(4)');
       ckCells.forEach(cell => cell.style.display = 'none');
     }
 
     const colSpanValue = hasAnyCK ? 4 : 3;
 
-    // ==================== THAY ĐỔI Ở ĐÂY ====================
-    // Tổng tiền hàng → đổi thành "Tổng cộng"
+    // ====================== THÊM CÁC DÒNG TỔNG TIỀN ======================
     if (hasProduct && tongGia > 0) {
       const totalRow = table.insertRow();
-      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
+      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Tổng cộng:</td>`;
       const totalCell = totalRow.insertCell(1);
       totalCell.colSpan = colSpanValue;
       totalCell.style.fontWeight = 'bold';
       totalCell.style.textAlign = 'right';
-      totalCell.style.paddingRight = '5px';
       totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
     }
 
@@ -184,57 +244,55 @@
     const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
     if (hasAnyCK && sauCKValue > 0) {
       const sauRow = table.insertRow();
-      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
+      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Sau CK:</td>`;
       const sauCell = sauRow.insertCell(1);
       sauCell.colSpan = colSpanValue;
       sauCell.style.fontWeight = 'bold';
       sauCell.style.textAlign = 'right';
-      sauCell.style.paddingRight = '5px';
       sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
     }
 
-    // Đơn cũ còn
+    // Đơn cũ còn, Khách trả, Tổng cộng còn... (giữ nguyên logic cũ của bạn)
     const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
     if (donCuConValue !== 0) {
       const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Đơn cũ còn:</td>`;
       const cell = row.insertCell(1);
       cell.colSpan = colSpanValue;
       cell.style.fontWeight = 'bold';
       cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
       cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
     }
 
-    // Khách trả
     const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
     if (khachTraValue !== 0) {
       const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Khách trả:</td>`;
       const cell = row.insertCell(1);
       cell.colSpan = colSpanValue;
       cell.style.fontWeight = 'bold';
       cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
       cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
     }
 
-    // Tổng cộng còn
     const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
     if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Tổng cộng còn:</td>`;
       const cell = row.insertCell(1);
       cell.colSpan = colSpanValue;
       cell.style.fontWeight = 'bold';
       cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
       cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
     }
 
-    // Share functions
+    // ====================== HÀM CHIA SẺ ======================
     async function captureInvoice() {
-      return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
+      return await html2canvas(document.getElementById("invoiceContent"), { 
+        scale: 3, 
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
     }
 
     async function shareInvoice() {
@@ -242,8 +300,14 @@
         const canvas = await captureInvoice();
         const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
         const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file] });
-      } catch (e) {}
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+        }
+      } catch (e) {
+        console.error("Lỗi chia sẻ ảnh:", e);
+        alert("Không thể chia sẻ ảnh. Vui lòng thử lại!");
+      }
     }
 
     async function shareInvoiceAsPdf() {
@@ -251,18 +315,45 @@
         const canvas = await captureInvoice();
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
+        
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
+        
+        const pdf = new jsPDF({ 
+          orientation: 'portrait', 
+          unit: 'mm', 
+          format: [210, Math.max(imgHeight + 20, 297)] 
+        });
+        
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
         const pdfBlob = pdf.output('blob');
         const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) await navigator.share({ files: [pdfFile] });
-      } catch (e) {}
+        
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile] });
+        }
+      } catch (e) {
+        console.error("Lỗi chia sẻ PDF:", e);
+        alert("Không thể tạo PDF. Vui lòng thử lại!");
+      }
     }
 
-    document.getElementById("shareBtn").addEventListener("click", shareInvoice);
-    document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
+    // ====================== XỬ LÝ CLICK BUTTON (SỬA LỖI OPERA) ======================
+    const shareBtn = document.getElementById("shareBtn");
+    const sharePdfBtn = document.getElementById("sharePdfBtn");
+
+    function addMobileClick(button, handler) {
+      button.addEventListener("click", handler);
+      
+      // Fix đặc biệt cho Opera Mobile
+      button.addEventListener("touchend", function(e) {
+        e.preventDefault();
+        handler(e);
+      }, { passive: false });
+    }
+
+    addMobileClick(shareBtn, shareInvoice);
+    addMobileClick(sharePdfBtn, shareInvoiceAsPdf);
   </script>
 </body>
 </html>
