@@ -5,60 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      margin: 0; 
-      padding: 0; 
-      background: #f8f8f8;
-    }
-    .invoice { 
-      width: 100%; 
-      max-width: 800px; 
-      margin: 0 auto; 
-      padding: 10px; 
-      background: white;
-    }
-    .header {
-      text-align: center;
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #333;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f8f8; }
+    .invoice { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; background: white; }
+    .header { text-align: center; font-size: 32px; font-weight: bold; margin-bottom: 15px; }
     .info p { margin: 6px 0; font-size: 20px; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 15px;
-      font-size: 20px;
-      border: 1px solid #000;
-    }
-    th, td {
-      padding: 6px 4px;
-      border: 1px solid #000;
-    }
-    th { font-weight: bold; text-align: center; background: #f0f0f0; }
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 8px; }
-    #invoiceTable td:not(:nth-child(1)) { text-align: right; padding-right: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 20px; border: 1px solid #000; }
+    th, td { padding: 6px 4px; border: 1px solid #000; }
+    th { background: #f0f0f0; font-weight: bold; text-align: center; }
 
     .button-container {
-      margin: 15px 10px 20px;
+      margin: 20px 10px;
       text-align: center;
       padding: 15px 0;
       background: white;
       position: sticky;
       bottom: 0;
       z-index: 100;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
     }
     button {
-      font-size: 20px;
+      font-size: 21px;
       padding: 16px 30px;
-      margin: 8px;
+      margin: 10px 8px;
       color: white;
       border: none;
-      border-radius: 8px;
-      min-height: 60px;
+      border-radius: 10px;
+      min-height: 62px;
+      width: 90%;
+      max-width: 320px;
       touch-action: manipulation;
     }
     #shareBtn { background-color: #673ab7; }
@@ -94,37 +68,28 @@
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    
-    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
-    const tenKhach = urlParams.get('khachhang') || '';
-    const donCuCon = urlParams.get('doncucon') || '0';
-    const khachTra = urlParams.get('khachtra') || '0';
-    const tongCong = urlParams.get('tongcong') || '0';
-    const sauCK = urlParams.get('sauck') || '0';
-    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-    const ghiChu = urlParams.get('ghichu') || '';
-    const data = urlParams.get('data') || '';
+    const maDonHang = urlParams.get('madonhang') || 'HOADON';
 
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
     // Điền thông tin
-    const tenKhachValue = decodeURIComponent(tenKhach).trim();
+    const tenKhachValue = decodeURIComponent(urlParams.get('khachhang') || '').trim();
     if (tenKhachValue) document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
     else document.getElementById('tenKhach').style.display = 'none';
 
-    document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
+    document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(urlParams.get('ngayban') || '[Ngày bán]')}`;
 
-    const ghiChuValue = decodeURIComponent(ghiChu).trim();
+    const ghiChuValue = decodeURIComponent(urlParams.get('ghichu') || '').trim();
     if (ghiChuValue) document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
     else document.getElementById('ghiChu').style.display = 'none';
 
-    // Xử lý bảng sản phẩm (giữ nguyên logic cũ)
+    // Xử lý bảng (logic cũ của bạn)
     const table = document.getElementById('invoiceTable');
     let tongGia = 0;
     let hasAnyCK = false;
-    let hasProduct = false;
+    const data = urlParams.get('data') || '';
 
-    if (data && data.trim() !== '') {
+    if (data) {
       const rowsData = decodeURIComponent(data).split('_b_');
       let detailRows = [];
 
@@ -135,14 +100,13 @@
 
         const sanPham = items[0].replace(/_/g, ',').trim();
         const soLuong = items[1];
-        let donGia, thanhTien, ckRaw;
+        let donGia, thanhTien, ckRaw = '0';
 
         if (items.length >= 5) {
           ckRaw = items[2] || '0';
           donGia = parseInt(items[3].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
         } else {
-          ckRaw = '0';
           donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
         }
@@ -152,11 +116,9 @@
 
         detailRows.push({ sanPham, soLuong, donGia, ckPercent, thanhTien });
         tongGia += thanhTien;
-        hasProduct = true;
       });
 
-      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
-
+      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi'));
       detailRows.forEach(item => {
         const row = table.insertRow();
         row.insertCell(0).textContent = item.sanPham;
@@ -173,104 +135,85 @@
       table.querySelectorAll('td:nth-child(4)').forEach(cell => cell.style.display = 'none');
     }
 
-    const colSpanValue = hasAnyCK ? 4 : 3;
-
-    if (hasProduct && tongGia > 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right;">Tổng cộng:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.textContent = `${tongGia.toLocaleString()} VNĐ`;
-    }
-
-    // Các dòng tổng tiền khác (giữ nguyên)...
-
+    // ====================== HÀM CHIA SẺ ƯU TIÊN ======================
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { 
         scale: 3, 
-        useCORS: true,
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff" 
       });
     }
 
-    // ====================== HÀM CHIA SẺ CẢI TIẾN ======================
-    async function shareInvoice() {
+    async function tryShare(blob, filename, title) {
       try {
-        const canvas = await captureInvoice();
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        const file = new File([blob], `HoaDon_${maDonHang}.png`, { type: 'image/png' });
+        const file = new File([blob], filename, { 
+          type: filename.endsWith('.pdf') ? 'application/pdf' : 'image/png' 
+        });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: 'Hoá đơn',
+            title: title,
             text: `Hoá đơn ${maDonHang}`
           });
-        } else {
-          // FALLBACK: Tải về nếu không share được
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = `HoaDon_${maDonHang}.png`;
-          link.click();
-          alert('Đã tải ảnh hoá đơn về máy!');
+          return true;
         }
-      } catch (err) {
-        console.error(err);
-        alert('Lỗi khi chia sẻ: ' + err.message);
+        return false;
+      } catch (e) {
+        console.log("Share failed:", e);
+        return false;
       }
     }
 
-    async function shareInvoiceAsPdf() {
+    // Button Chia sẻ Ảnh
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      try {
+        const canvas = await captureInvoice();
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+
+        const shared = await tryShare(blob, `HoaDon_${maDonHang}.png`, "Hoá đơn");
+        
+        if (!shared) {
+          // Fallback tải về
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `HoaDon_${maDonHang}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+          alert("✅ Đã tải ảnh về (không share được)");
+        }
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      }
+    });
+
+    // Button Chia sẻ PDF
+    document.getElementById("sharePdfBtn").addEventListener("click", async () => {
       try {
         const canvas = await captureInvoice();
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
-        
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgWidth = 190;
-        const pageHeight = 297;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        
+
         const pdfBlob = pdf.output('blob');
-        const file = new File([pdfBlob], `HoaDon_${maDonHang}.pdf`, { type: 'application/pdf' });
+        const shared = await tryShare(pdfBlob, `HoaDon_${maDonHang}.pdf`, "Hoá đơn PDF");
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Hoá đơn PDF',
-          });
-        } else {
-          // FALLBACK: Tải PDF
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = `HoaDon_${maDonHang}.pdf`;
-          link.click();
-          alert('Đã tải file PDF về máy!');
+        if (!shared) {
+          const url = URL.createObjectURL(pdfBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `HoaDon_${maDonHang}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+          alert("✅ Đã tải PDF về (không share được)");
         }
-      } catch (err) {
-        console.error(err);
-        alert('Lỗi khi tạo PDF: ' + err.message);
+      } catch (e) {
+        alert("Lỗi PDF: " + e.message);
       }
-    }
-
-    // Gắn sự kiện
-    document.getElementById("shareBtn").addEventListener("click", shareInvoice);
-    document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
-
-    // Thêm touchend cho Opera
-    document.getElementById("shareBtn").addEventListener("touchend", (e) => {
-      e.preventDefault();
-      shareInvoice();
-    }, { passive: false });
-
-    document.getElementById("sharePdfBtn").addEventListener("touchend", (e) => {
-      e.preventDefault();
-      shareInvoiceAsPdf();
-    }, { passive: false });
+    });
   </script>
 </body>
 </html>
