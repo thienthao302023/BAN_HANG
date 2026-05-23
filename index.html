@@ -1,564 +1,268 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
-
-<style>
-body{
-  font-family: Arial, sans-serif;
-  margin:0;
-  padding:0;
-}
-
-.invoice{
-  width:100%;
-  margin:0;
-  padding:5px;
-  box-sizing:border-box;
-}
-
-.header{
-  text-align:center;
-  font-size:30px;
-  font-weight:bold;
-  margin-bottom:10px;
-}
-
-.info p{
-  margin:5px 0;
-  font-size:20px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-bottom:10px;
-  font-size:20px;
-  border:1px solid #000;
-}
-
-th, td{
-  padding:4px;
-  border:1px solid #000;
-}
-
-th{
-  font-weight:bold;
-  text-align:center;
-}
-
-#invoiceTable td:nth-child(1){
-  text-align:left;
-  padding-left:5px;
-}
-
-#invoiceTable td:not(:nth-child(1)){
-  text-align:right;
-  padding-right:5px;
-}
-
-.button-container{
-  margin:10px;
-  text-align:center;
-}
-
-button{
-  font-size:20px;
-  padding:10px 20px;
-  margin:5px;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-#shareBtn{
-  background-color:#673ab7;
-}
-
-#shareBtn:hover{
-  background-color:#512da8;
-}
-
-#sharePdfBtn{
-  background-color:#e91e63;
-}
-
-#sharePdfBtn:hover{
-  background-color:#c2185b;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .invoice { width: 100%; margin: 0; padding: 5px; }
+    .header {
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .info p { margin: 5px 0; font-size: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+      font-size: 20px;
+      border: 1px solid #000;
+    }
+    th, td {
+      padding: 4px;
+      border: 1px solid #000;
+    }
+    th { font-weight: bold; text-align: center; }
+   
+    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
+    #invoiceTable td:not(:nth-child(1)) {
+      text-align: right;
+      padding-right: 5px;
+    }
+    .button-container {
+      margin: 10px;
+      text-align: center;
+    }
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin: 5px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #shareBtn { background-color: #673ab7; }
+    #shareBtn:hover { background-color: #512da8; }
+    #sharePdfBtn { background-color: #e91e63; }
+    #sharePdfBtn:hover { background-color: #c2185b; }
+  </style>
 </head>
-
 <body>
-
-<div class="invoice" id="invoiceContent">
-
-  <div class="header">HOÁ ĐƠN</div>
-
-  <div class="info">
-    <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
-    <p id="ngayBan">Ngày bán: [Ngày bán]</p>
-    <p id="ghiChu">Ghi chú: [GHI CHÚ]</p>
+  <div class="invoice" id="invoiceContent">
+    <div class="header">HOÁ ĐƠN</div>
+    <div class="info">
+      <p id="tenKhach">Khách hàng: [KHÁCH HÀNG]</p>
+      <p id="ngayBan">Ngày bán: [Ngày bán]</p>
+      <p id="ghiChu">Ghi chú: [GHI CHÚ]</p>
+    </div>
+    <table id="invoiceTable">
+      <tr>
+        <th>SẢN PHẨM</th>
+        <th>SL</th>
+        <th>Đ.GIÁ</th>
+        <th id="ckHeader">CK</th>
+        <th>T.TIỀN</th>
+      </tr>
+    </table>
+  </div>
+  <div class="button-container">
+    <button id="shareBtn">Chia sẻ</button>
+    <button id="sharePdfBtn">Chia sẻ PDF</button>
   </div>
 
-  <table id="invoiceTable">
-    <tr>
-      <th>SẢN PHẨM</th>
-      <th>SL</th>
-      <th>Đ.GIÁ</th>
-      <th id="ckHeader">CK</th>
-      <th>T.TIỀN</th>
-    </tr>
-  </table>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+  
+    const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
+    const tenKhach = urlParams.get('khachhang') || '';
+    const donCuCon = urlParams.get('doncucon') || '0';
+    const khachTra = urlParams.get('khachtra') || '0';
+    const tongCong = urlParams.get('tongcong') || '0';
+    const sauCK = urlParams.get('sauck') || '0';
+    const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
+    const ghiChu = urlParams.get('ghichu') || '';
+    const data = urlParams.get('data') || '';
 
-</div>
+    document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
-<div class="button-container">
-  <button id="shareBtn">Chia sẻ</button>
-  <button id="sharePdfBtn">Chia sẻ PDF</button>
-</div>
+    const tenKhachValue = decodeURIComponent(tenKhach).trim();
+    if (tenKhachValue) document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
+    else document.getElementById('tenKhach').style.display = 'none';
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-
-const urlParams = new URLSearchParams(window.location.search);
-
-const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
-const tenKhach = urlParams.get('khachhang') || '';
-const donCuCon = urlParams.get('doncucon') || '0';
-const khachTra = urlParams.get('khachtra') || '0';
-const tongCong = urlParams.get('tongcong') || '0';
-const sauCK = urlParams.get('sauck') || '0';
-const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
-const ghiChu = urlParams.get('ghichu') || '';
-const data = urlParams.get('data') || '';
-
-document.getElementById('pageTitle').textContent =
-  decodeURIComponent(maDonHang);
-
-const tenKhachValue =
-  decodeURIComponent(tenKhach).trim();
-
-if(tenKhachValue){
-  document.getElementById('tenKhach').textContent =
-    `Khách hàng: ${tenKhachValue}`;
-}else{
-  document.getElementById('tenKhach').style.display = 'none';
-}
-
-document.getElementById('ngayBan').textContent =
-  `Ngày bán: ${decodeURIComponent(ngayBan)}`;
-
-const ghiChuValue =
-  decodeURIComponent(ghiChu).trim();
-
-if(ghiChuValue){
-  document.getElementById('ghiChu').textContent =
-    `Ghi chú: ${ghiChuValue}`;
-}else{
-  document.getElementById('ghiChu').style.display = 'none';
-}
-
-const table = document.getElementById('invoiceTable');
-
-let tongGia = 0;
-let hasAnyCK = false;
-let hasProduct = false;
-
-if(data && data.trim() !== ''){
-
-  const rowsData =
-    decodeURIComponent(data).split('_b_');
-
-  let detailRows = [];
-
-  rowsData.forEach(record => {
-
-    if(!record.trim()) return;
-
-    const items = record.split('_a_');
-
-    if(items.length < 4) return;
-
-    const sanPham =
-      items[0].replace(/_/g, ',').trim();
-
-    const soLuong = items[1];
-
-    let donGia;
-    let thanhTien;
-    let ckRaw;
-
-    if(items.length >= 5){
-
-      ckRaw = items[2] || '0';
-
-      donGia =
-        parseInt(items[3].replace(/,/g,'')) || 0;
-
-      thanhTien =
-        parseInt(items[4].replace(/,/g,'')) || 0;
-
-    }else{
-
-      ckRaw = '0';
-
-      donGia =
-        parseInt(items[2].replace(/,/g,'')) || 0;
-
-      thanhTien =
-        parseInt(items[3].replace(/,/g,'')) || 0;
+    const ghiChuValue = decodeURIComponent(ghiChu).trim();
+    if (ghiChuValue) {
+      document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
+    } else {
+      document.getElementById('ghiChu').style.display = 'none';
     }
 
-    const ckPercent =
-      parseFloat(ckRaw) * 100 || 0;
+    const table = document.getElementById('invoiceTable');
+    let tongGia = 0;
+    let hasAnyCK = false;
+    let hasProduct = false;
 
-    if(ckPercent > 0){
-      hasAnyCK = true;
-    }
+    // Xử lý sản phẩm
+    if (data && data.trim() !== '') {
+      const rowsData = decodeURIComponent(data).split('_b_');
+      let detailRows = [];
 
-    detailRows.push({
-      sanPham,
-      soLuong,
-      donGia,
-      ckPercent,
-      thanhTien
-    });
+      rowsData.forEach(record => {
+        if (!record.trim()) return;
+        const items = record.split('_a_');
+        if (items.length < 4) return;
 
-    tongGia += thanhTien;
-    hasProduct = true;
-  });
+        const sanPham = items[0].replace(/_/g, ',').trim();
+        const soLuong = items[1];
 
-  detailRows.sort((a, b) =>
-    a.sanPham.localeCompare(
-      b.sanPham,
-      'vi',
-      { sensitivity:'base' }
-    )
-  );
+        let donGia, thanhTien, ckRaw;
+        if (items.length >= 5) {
+          ckRaw = items[2] || '0';
+          donGia = parseInt(items[3].replace(/,/g, '')) || 0;
+          thanhTien = parseInt(items[4].replace(/,/g, '')) || 0;
+        } else {
+          ckRaw = '0';
+          donGia = parseInt(items[2].replace(/,/g, '')) || 0;
+          thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
+        }
 
-  detailRows.forEach(item => {
+        const ckPercent = parseFloat(ckRaw) * 100 || 0;
+        if (ckPercent > 0) hasAnyCK = true;
 
-    const row = table.insertRow();
-
-    row.insertCell(0).textContent =
-      item.sanPham;
-
-    row.insertCell(1).textContent =
-      item.soLuong;
-
-    row.insertCell(2).textContent =
-      item.donGia.toLocaleString();
-
-    const ckCell = row.insertCell(3);
-
-    ckCell.textContent =
-      item.ckPercent > 0
-        ? item.ckPercent.toFixed(0) + '%'
-        : '';
-
-    row.insertCell(4).textContent =
-      item.thanhTien.toLocaleString();
-  });
-}
-
-const ckHeader =
-  document.getElementById('ckHeader');
-
-if(!hasAnyCK){
-
-  ckHeader.style.display = 'none';
-
-  const ckCells =
-    table.querySelectorAll('td:nth-child(4)');
-
-  ckCells.forEach(cell => {
-    cell.style.display = 'none';
-  });
-}
-
-const colSpanValue =
-  hasAnyCK ? 4 : 3;
-
-function addTotalRow(label, value){
-
-  const row = table.insertRow();
-
-  row.insertCell(0).outerHTML =
-    `<td colspan="1"
-      style="
-      font-weight:bold;
-      text-align:right;
-      padding-left:5px;
-      ">
-      ${label}
-    </td>`;
-
-  const cell = row.insertCell(1);
-
-  cell.colSpan = colSpanValue;
-
-  cell.style.fontWeight = 'bold';
-  cell.style.textAlign = 'right';
-  cell.style.paddingRight = '5px';
-
-  cell.textContent =
-    `${value.toLocaleString()} VNĐ`;
-}
-
-if(hasProduct && tongGia > 0){
-  addTotalRow('Tổng cộng:', tongGia);
-}
-
-const sauCKValue =
-  parseInt(
-    decodeURIComponent(sauCK)
-    .replace(/,/g,'')
-  ) || 0;
-
-if(hasAnyCK && sauCKValue > 0){
-  addTotalRow('Sau CK:', sauCKValue);
-}
-
-const donCuConValue =
-  parseInt(
-    decodeURIComponent(donCuCon)
-    .replace(/,/g,'')
-  ) || 0;
-
-if(donCuConValue !== 0){
-  addTotalRow('Đơn cũ còn:', donCuConValue);
-}
-
-const khachTraValue =
-  parseInt(
-    decodeURIComponent(khachTra)
-    .replace(/,/g,'')
-  ) || 0;
-
-if(khachTraValue !== 0){
-  addTotalRow('Khách trả:', khachTraValue);
-}
-
-const tongCongValue =
-  parseInt(
-    decodeURIComponent(tongCong)
-    .replace(/,/g,'')
-  ) || 0;
-
-if(
-  tongCongValue !== 0 ||
-  donCuConValue !== 0 ||
-  khachTraValue !== 0
-){
-  addTotalRow(
-    'Tổng cộng còn:',
-    tongCongValue
-  );
-}
-
-/* =========================
-   SHARE FUNCTIONS
-========================= */
-
-async function captureInvoice(){
-
-  return await html2canvas(
-    document.getElementById("invoiceContent"),
-    {
-      scale:1.5,
-      useCORS:true,
-      backgroundColor:"#ffffff"
-    }
-  );
-}
-
-/* Opera fix */
-function canvasToBlob(
-  canvas,
-  type='image/png',
-  quality=1
-){
-
-  return new Promise((resolve)=>{
-
-    if(canvas.toBlob){
-
-      canvas.toBlob((blob)=>{
-        resolve(blob);
-      }, type, quality);
-
-    }else{
-
-      const dataUrl =
-        canvas.toDataURL(type, quality);
-
-      const byteString =
-        atob(dataUrl.split(',')[1]);
-
-      const mimeString =
-        dataUrl
-        .split(',')[0]
-        .split(':')[1]
-        .split(';')[0];
-
-      const ab =
-        new ArrayBuffer(byteString.length);
-
-      const ia =
-        new Uint8Array(ab);
-
-      for(let i=0;i<byteString.length;i++){
-        ia[i] =
-          byteString.charCodeAt(i);
-      }
-
-      resolve(
-        new Blob([ab], {
-          type:mimeString
-        })
-      );
-    }
-  });
-}
-
-/* SHARE PNG */
-async function shareInvoice(){
-
-  try{
-
-    const canvas =
-      await captureInvoice();
-
-    const blob =
-      await canvasToBlob(canvas);
-
-    if(!blob){
-      alert("Không tạo được ảnh");
-      return;
-    }
-
-    const file = new File(
-      [blob],
-      `hoa_don_${maDonHang}.png`,
-      {
-        type:'image/png'
-      }
-    );
-
-    if(navigator.share){
-
-      await navigator.share({
-        title: maDonHang,
-        files:[file]
+        detailRows.push({ sanPham, soLuong, donGia, ckPercent, thanhTien });
+        tongGia += thanhTien;
+        hasProduct = true;
       });
 
-    }else{
+      // Sắp xếp theo tên sản phẩm A → Z
+      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
 
-      alert(
-        "Trình duyệt không hỗ trợ chia sẻ"
-      );
-    }
+      detailRows.forEach(item => {
+        const row = table.insertRow();
+        row.insertCell(0).textContent = item.sanPham;
+        row.insertCell(1).textContent = item.soLuong;
+        row.insertCell(2).textContent = item.donGia.toLocaleString();
 
-  }catch(e){
+        const ckCell = row.insertCell(3);
+        ckCell.textContent = (item.ckPercent > 0) ? item.ckPercent.toFixed(0) + '%' : '';
 
-    console.log(e);
-
-    alert("Lỗi chia sẻ ảnh");
-  }
-}
-
-/* SHARE PDF */
-async function shareInvoiceAsPdf(){
-
-  try{
-
-    const canvas =
-      await captureInvoice();
-
-    const imgData =
-      canvas.toDataURL('image/png');
-
-    const { jsPDF } = window.jspdf;
-
-    const imgWidth = 190;
-
-    const imgHeight =
-      (canvas.height * imgWidth)
-      / canvas.width;
-
-    const pdf = new jsPDF({
-      orientation:'portrait',
-      unit:'mm',
-      format:[
-        210,
-        Math.max(imgHeight + 20, 297)
-      ]
-    });
-
-    pdf.addImage(
-      imgData,
-      'PNG',
-      10,
-      10,
-      imgWidth,
-      imgHeight
-    );
-
-    const pdfBlob =
-      pdf.output('blob');
-
-    const pdfFile = new File(
-      [pdfBlob],
-      `hoa_don_${maDonHang}.pdf`,
-      {
-        type:'application/pdf'
-      }
-    );
-
-    if(navigator.share){
-
-      await navigator.share({
-        title: maDonHang,
-        files:[pdfFile]
+        row.insertCell(4).textContent = item.thanhTien.toLocaleString();
       });
-
-    }else{
-
-      alert(
-        "Trình duyệt không hỗ trợ chia sẻ"
-      );
     }
 
-  }catch(e){
+    // Ẩn cột CK nếu không có
+    const ckHeader = document.getElementById('ckHeader');
+    if (!hasAnyCK) {
+      ckHeader.style.display = 'none';
+      const ckCells = table.querySelectorAll('td:nth-child(4)');
+      ckCells.forEach(cell => cell.style.display = 'none');
+    }
 
-    console.log(e);
+    const colSpanValue = hasAnyCK ? 4 : 3;
 
-    alert("Lỗi chia sẻ PDF");
-  }
-}
+    // ==================== THAY ĐỔI Ở ĐÂY ====================
+    // Tổng tiền hàng → đổi thành "Tổng cộng"
+    if (hasProduct && tongGia > 0) {
+      const totalRow = table.insertRow();
+      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
+      const totalCell = totalRow.insertCell(1);
+      totalCell.colSpan = colSpanValue;
+      totalCell.style.fontWeight = 'bold';
+      totalCell.style.textAlign = 'right';
+      totalCell.style.paddingRight = '5px';
+      totalCell.textContent = `${tongGia.toLocaleString()} VNĐ`;
+    }
 
-document
-.getElementById("shareBtn")
-.addEventListener(
-  "click",
-  shareInvoice
-);
+    // Sau CK
+    const sauCKValue = parseInt(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
+    if (hasAnyCK && sauCKValue > 0) {
+      const sauRow = table.insertRow();
+      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
+      const sauCell = sauRow.insertCell(1);
+      sauCell.colSpan = colSpanValue;
+      sauCell.style.fontWeight = 'bold';
+      sauCell.style.textAlign = 'right';
+      sauCell.style.paddingRight = '5px';
+      sauCell.textContent = `${sauCKValue.toLocaleString()} VNĐ`;
+    }
 
-document
-.getElementById("sharePdfBtn")
-.addEventListener(
-  "click",
-  shareInvoiceAsPdf
-);
+    // Đơn cũ còn
+    const donCuConValue = parseInt(decodeURIComponent(donCuCon).replace(/,/g,'')) || 0;
+    if (donCuConValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${donCuConValue.toLocaleString()} VNĐ`;
+    }
 
-</script>
+    // Khách trả
+    const khachTraValue = parseInt(decodeURIComponent(khachTra).replace(/,/g,'')) || 0;
+    if (khachTraValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
+    }
 
+    // Tổng cộng còn
+    const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
+    if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
+      const row = table.insertRow();
+      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
+      const cell = row.insertCell(1);
+      cell.colSpan = colSpanValue;
+      cell.style.fontWeight = 'bold';
+      cell.style.textAlign = 'right';
+      cell.style.paddingRight = '5px';
+      cell.textContent = `${tongCongValue.toLocaleString()} VNĐ`;
+    }
+
+    // Share functions
+    async function captureInvoice() {
+      return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
+    }
+
+    async function shareInvoice() {
+      try {
+        const canvas = await captureInvoice();
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file] });
+      } catch (e) {}
+    }
+
+    async function shareInvoiceAsPdf() {
+      try {
+        const canvas = await captureInvoice();
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        const pdfBlob = pdf.output('blob');
+        const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) await navigator.share({ files: [pdfFile] });
+      } catch (e) {}
+    }
+
+    document.getElementById("shareBtn").addEventListener("click", shareInvoice);
+    document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
+  </script>
 </body>
 </html>
