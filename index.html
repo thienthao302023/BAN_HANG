@@ -167,8 +167,7 @@
 
     const colSpanValue = hasAnyCK ? 4 : 3;
 
-    // ==================== THAY ĐỔI Ở ĐÂY ====================
-    // Tổng tiền hàng → đổi thành "Tổng cộng"
+    // ==================== TỔNG TIỀN ====================
     if (hasProduct && tongGia > 0) {
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
@@ -219,9 +218,10 @@
       cell.textContent = `${khachTraValue.toLocaleString()} VNĐ`;
     }
 
-    // Tổng cộng còn
+    // ==================== SỬA ĐỔI Ở ĐÂY ====================
+    // Chỉ hiển thị "Tổng cộng còn" khi có "Đơn cũ còn" HOẶC "Khách trả"
     const tongCongValue = parseInt(decodeURIComponent(tongCong).replace(/,/g,'')) || 0;
-    if (tongCongValue !== 0 || donCuConValue !== 0 || khachTraValue !== 0) {
+    if (donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
       row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
       const cell = row.insertCell(1);
