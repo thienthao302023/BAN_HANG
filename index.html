@@ -92,7 +92,6 @@
 
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
-    // Khách hàng
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
     if (tenKhachValue) {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
@@ -102,7 +101,6 @@
 
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
 
-    // Ghi chú
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue) {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
@@ -147,7 +145,6 @@
         hasProduct = true;
       });
 
-      // Sắp xếp theo tên sản phẩm
       detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
 
       detailRows.forEach(item => {
@@ -171,7 +168,7 @@
     const colSpanValue = hasAnyCK ? 4 : 3;
 
     // ====================== CÁC DÒNG TỔNG TIỀN ======================
-    
+
     // Tổng cộng sản phẩm
     if (hasProduct && tongGia !== 0) {
       const totalRow = table.insertRow();
@@ -184,9 +181,9 @@
       totalCell.textContent = `${tongGia.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Sau CK
+    // ==================== SAU CK (CHỈ HIỂN THỊ KHI CÓ CK) ====================
     const sauCKValue = Number(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
-    if (sauCKValue !== 0) {
+    if (hasAnyCK && sauCKValue !== 0) {
       const sauRow = table.insertRow();
       sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
       const sauCell = sauRow.insertCell(1);
@@ -197,7 +194,7 @@
       sauCell.textContent = `${sauCKValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Đơn cũ còn (có thể âm)
+    // Đơn cũ còn
     const donCuConValue = Number(decodeURIComponent(donCuCon).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0) {
       const row = table.insertRow();
@@ -210,7 +207,7 @@
       cell.textContent = `${donCuConValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Khách trả (có thể âm)
+    // Khách trả
     const khachTraValue = Number(decodeURIComponent(khachTra).replace(/,/g, '')) || 0;
     if (khachTraValue !== 0) {
       const row = table.insertRow();
@@ -223,7 +220,7 @@
       cell.textContent = `${khachTraValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Tổng cộng còn (hiển thị khi có đơn cũ hoặc khách trả, dù âm hay dương)
+    // Tổng cộng còn
     const tongCongValue = Number(decodeURIComponent(tongCong).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
