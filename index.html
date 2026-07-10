@@ -46,8 +46,10 @@
       cursor: pointer;
     }
     #shareBtn { background-color: #673ab7; }
+    #shareBtn:hover { background-color: #512da8; }
     #sharePdfBtn { background-color: #e91e63; }
     #sharePdfBtn:hover { background-color: #c2185b; }
+    #savePdfBtn { background-color: #4caf50; }
   </style>
 </head>
 <body>
@@ -72,11 +74,11 @@
   <div class="button-container">
     <button id="shareBtn">Chia sẻ</button>
     <button id="sharePdfBtn">Chia sẻ PDF</button>
+    <button id="savePdfBtn">Lưu PDF</button>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <script>
     const urlParams = new URLSearchParams(window.location.search);
  
@@ -165,7 +167,6 @@
 
     const colSpanValue = hasAnyCK ? 4 : 3;
 
-    // Tổng cộng sản phẩm
     if (hasProduct && tongGia !== 0) {
       const totalRow = table.insertRow();
       totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
@@ -177,7 +178,6 @@
       totalCell.textContent = `${tongGia.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Sau CK
     const sauCKValue = Number(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
     if (hasAnyCK && sauCKValue !== 0) {
       const sauRow = table.insertRow();
@@ -190,7 +190,6 @@
       sauCell.textContent = `${sauCKValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Đơn cũ còn
     const donCuConValue = Number(decodeURIComponent(donCuCon).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0) {
       const row = table.insertRow();
@@ -203,7 +202,6 @@
       cell.textContent = `${donCuConValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Khách trả
     const khachTraValue = Number(decodeURIComponent(khachTra).replace(/,/g, '')) || 0;
     if (khachTraValue !== 0) {
       const row = table.insertRow();
@@ -216,7 +214,6 @@
       cell.textContent = `${khachTraValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // Tổng cộng còn
     const tongCongValue = Number(decodeURIComponent(tongCong).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
@@ -229,48 +226,41 @@
       cell.textContent = `${tongCongValue.toLocaleString('vi-VN')} VNĐ`;
     }
 
-    // ==================== HÀM CHIA SẺ TỐI ƯU ====================
+    // ====================== SHARE FUNCTIONS ======================
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
     }
 
-    async function shareFile(file, title = "Hóa đơn") {
-      try {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ 
-            title: title,
-            files: [file] 
-          });
-          return;
-        }
-      } catch (e) {
-        console.log("Web Share không hỗ trợ đầy đủ trên iOS");
-      }
-
-      // Fallback cho iOS
-      const url = URL.createObjectURL(file);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      setTimeout(() => {
-        alert("File đã tải xuống.\n\nHãy mở Trung tâm Tải xuống của Safari (kéo thanh địa chỉ xuống) → nhấn vào file → bấm Chia sẻ để chọn ứng dụng mong muốn.");
-      }, 800);
-
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    }
-
     async function shareInvoice() {
-      const canvas = await captureInvoice();
-      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-      const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-      await shareFile(file);
+      try {
+        const canvas = await captureInvoice();
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+        }
+      } catch (e) { console.error(e); }
     }
 
     async function shareInvoiceAsPdf() {
+      try {
+        const canvas = await captureInvoice();
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        const pdfBlob = pdf.output('blob');
+        const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile] });
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ====================== NÚT LƯU PDF MỚI ======================
+    async function savePdf() {
       const canvas = await captureInvoice();
       const imgData = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
@@ -278,13 +268,12 @@
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
       pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-      const pdfBlob = pdf.output('blob');
-      const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
-      await shareFile(pdfFile);
+      pdf.save(`hoa_don_${maDonHang}.pdf`);
     }
 
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
     document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
+    document.getElementById("savePdfBtn").addEventListener("click", savePdf);
   </script>
 </body>
 </html>
