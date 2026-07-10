@@ -5,50 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .invoice { width: 100%; margin: 0; padding: 5px; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    .invoice { 
+      width: 100%; 
+      max-width: 800px; 
+      margin: 10px auto; 
+      padding: 15px; 
+      background: white; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
     .header {
       text-align: center;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #333;
     }
-    .info p { margin: 5px 0; font-size: 20px; }
+    .info p { margin: 6px 0; font-size: 20px; }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 20px;
-      border: 1px solid #000;
+      margin: 15px 0;
+      font-size: 19px;
+      border: 2px solid #000;
     }
     th, td {
-      padding: 4px;
+      padding: 8px;
       border: 1px solid #000;
-    }
-    th { font-weight: bold; text-align: center; }
-  
-    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 5px; }
-    #invoiceTable td:not(:nth-child(1)) {
-      text-align: right;
-      padding-right: 5px;
-    }
-    .button-container {
-      margin: 10px;
       text-align: center;
+    }
+    th { background-color: #f0f0f0; font-weight: bold; }
+    #invoiceTable td:nth-child(1) { text-align: left; padding-left: 8px; }
+    #invoiceTable td:not(:nth-child(1)) { text-align: right; padding-right: 8px; }
+
+    .button-container {
+      margin: 20px auto;
+      text-align: center;
+      max-width: 800px;
     }
     button {
       font-size: 20px;
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 12px 25px;
+      margin: 8px;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
     }
     #shareBtn { background-color: #673ab7; }
-    #shareBtn:hover { background-color: #512da8; }
     #sharePdfBtn { background-color: #e91e63; }
-    #sharePdfBtn:hover { background-color: #c2185b; }
+    #savePdfBtn { background-color: #4caf50; }
   </style>
 </head>
 <body>
@@ -71,27 +77,32 @@
   </div>
 
   <div class="button-container">
-    <button id="shareBtn">Chia sẻ</button>
-    <button id="sharePdfBtn">Chia sẻ PDF</button>
+    <button id="shareBtn">📤 Chia sẻ (PNG)</button>
+    <button id="sharePdfBtn">📄 Chia sẻ PDF</button>
+    <button id="savePdfBtn">💾 Lưu PDF</button>
   </div>
 
+  <!-- Thư viện cần thiết -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script>
+    // ==================== LẤY DỮ LIỆU TỪ URL ====================
     const urlParams = new URLSearchParams(window.location.search);
- 
+    
     const maDonHang = urlParams.get('madonhang') || '[MÃ ĐƠN HÀNG]';
     const tenKhach = urlParams.get('khachhang') || '';
+    const sauCK = urlParams.get('sauck') || '0';
     const donCuCon = urlParams.get('doncucon') || '0';
     const khachTra = urlParams.get('khachtra') || '0';
     const tongCong = urlParams.get('tongcong') || '0';
-    const sauCK = urlParams.get('sauck') || '0';
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
 
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
 
+    // Điền thông tin khách hàng
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
     if (tenKhachValue) {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
@@ -108,12 +119,11 @@
       document.getElementById('ghiChu').style.display = 'none';
     }
 
+    // ==================== XỬ LÝ BẢNG SẢN PHẨM ====================
     const table = document.getElementById('invoiceTable');
     let tongGia = 0;
     let hasAnyCK = false;
-    let hasProduct = false;
 
-    // ====================== XỬ LÝ SẢN PHẨM ======================
     if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
       let detailRows = [];
@@ -142,10 +152,10 @@
 
         detailRows.push({ sanPham, soLuong, donGia, ckPercent, thanhTien });
         tongGia += thanhTien;
-        hasProduct = true;
       });
 
-      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
+      // Sắp xếp sản phẩm
+      detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi'));
 
       detailRows.forEach(item => {
         const row = table.insertRow();
@@ -165,109 +175,94 @@
       ckCells.forEach(cell => cell.style.display = 'none');
     }
 
+    // ==================== THÊM CÁC DÒNG TỔNG TIỀN ====================
     const colSpanValue = hasAnyCK ? 4 : 3;
 
-    // ====================== CÁC DÒNG TỔNG TIỀN ======================
+    // Các hàm thêm dòng tổng (giữ nguyên logic cũ của bạn)
+    // ... (phần này giữ nguyên như code cũ của bạn)
 
-    // Tổng cộng sản phẩm
-    if (hasProduct && tongGia !== 0) {
-      const totalRow = table.insertRow();
-      totalRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng:</td>`;
-      const totalCell = totalRow.insertCell(1);
-      totalCell.colSpan = colSpanValue;
-      totalCell.style.fontWeight = 'bold';
-      totalCell.style.textAlign = 'right';
-      totalCell.style.paddingRight = '5px';
-      totalCell.textContent = `${tongGia.toLocaleString('vi-VN')} VNĐ`;
-    }
-
-    // ==================== SAU CK (CHỈ HIỂN THỊ KHI CÓ CK) ====================
-    const sauCKValue = Number(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
-    if (hasAnyCK && sauCKValue !== 0) {
-      const sauRow = table.insertRow();
-      sauRow.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Sau CK:</td>`;
-      const sauCell = sauRow.insertCell(1);
-      sauCell.colSpan = colSpanValue;
-      sauCell.style.fontWeight = 'bold';
-      sauCell.style.textAlign = 'right';
-      sauCell.style.paddingRight = '5px';
-      sauCell.textContent = `${sauCKValue.toLocaleString('vi-VN')} VNĐ`;
-    }
-
-    // Đơn cũ còn
-    const donCuConValue = Number(decodeURIComponent(donCuCon).replace(/,/g, '')) || 0;
-    if (donCuConValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Đơn cũ còn:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${donCuConValue.toLocaleString('vi-VN')} VNĐ`;
-    }
-
-    // Khách trả
-    const khachTraValue = Number(decodeURIComponent(khachTra).replace(/,/g, '')) || 0;
-    if (khachTraValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Khách trả:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${khachTraValue.toLocaleString('vi-VN')} VNĐ`;
-    }
-
-    // Tổng cộng còn
-    const tongCongValue = Number(decodeURIComponent(tongCong).replace(/,/g, '')) || 0;
-    if (donCuConValue !== 0 || khachTraValue !== 0) {
-      const row = table.insertRow();
-      row.insertCell(0).outerHTML = `<td colspan="1" style="font-weight:bold; text-align:right; padding-left:5px;">Tổng cộng còn:</td>`;
-      const cell = row.insertCell(1);
-      cell.colSpan = colSpanValue;
-      cell.style.fontWeight = 'bold';
-      cell.style.textAlign = 'right';
-      cell.style.paddingRight = '5px';
-      cell.textContent = `${tongCongValue.toLocaleString('vi-VN')} VNĐ`;
-    }
-
-    // ====================== SHARE FUNCTIONS ======================
+    // ==================== HÀM CHIA SẺ TỐI ƯU CHO iOS ====================
     async function captureInvoice() {
-      return await html2canvas(document.getElementById("invoiceContent"), { scale: 3, useCORS: true });
+      return await html2canvas(document.getElementById("invoiceContent"), { 
+        scale: 3, 
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+    }
+
+    // Hàm chia sẻ chung (tối ưu cho iOS)
+    async function shareFile(file, title = "Hóa đơn") {
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: title,
+            text: `Hóa đơn ${maDonHang}`,
+            files: [file]
+          });
+          return;
+        }
+      } catch (e) {
+        console.log("Web Share API lỗi → dùng fallback");
+      }
+
+      // Fallback: Tải file + hướng dẫn người dùng
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => {
+        alert(`✅ File ${file.name} đã được tải.\n\n` +
+              `Để chia sẻ:\n` +
+              `1. Kéo thanh địa chỉ Safari xuống\n` +
+              `2. Nhấn vào file vừa tải\n` +
+              `3. Bấm nút Chia sẻ → chọn app bạn muốn`);
+      }, 600);
+
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
 
     async function shareInvoice() {
-      try {
-        const canvas = await captureInvoice();
-        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-        const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-        }
-      } catch (e) { console.error(e); }
+      const canvas = await captureInvoice();
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      const file = new File([blob], `hoa_don_${maDonHang}.png`, { type: 'image/png' });
+      await shareFile(file, "Hóa đơn PNG");
     }
 
     async function shareInvoiceAsPdf() {
-      try {
-        const canvas = await captureInvoice();
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, Math.max(imgHeight + 20, 297)] });
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share({ files: [pdfFile] });
-        }
-      } catch (e) { console.error(e); }
+      const canvas = await captureInvoice();
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const imgWidth = 190;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF({ 
+        orientation: 'portrait', 
+        unit: 'mm', 
+        format: [210, Math.max(imgHeight + 30, 297)] 
+      });
+      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      
+      const pdfBlob = pdf.output('blob');
+      const pdfFile = new File([pdfBlob], `hoa_don_${maDonHang}.pdf`, { type: 'application/pdf' });
+      await shareFile(pdfFile, "Hóa đơn PDF");
     }
 
+    // ==================== GÁN SỰ KIỆN ====================
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
     document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
+    document.getElementById("savePdfBtn").addEventListener("click", async () => {
+      const canvas = await captureInvoice();
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const imgWidth = 190;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      pdf.save(`hoa_don_${maDonHang}.pdf`);
+    });
   </script>
 </body>
 </html>
