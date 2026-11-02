@@ -101,22 +101,27 @@
       cursor: pointer;
     }
 
-    /* QR hiện dưới hoá đơn */
+    /* QR hiện dưới hoá đơn - TO HƠN */
     #qrSection {
       display: none;
       text-align: center;
-      margin-top: 12px;
+      margin-top: 14px;
       padding-top: 8px;
     }
     #qrSection img {
-      max-width: 180px;
+      max-width: 260px;
       width: 100%;
       height: auto;
     }
-    #qrLabel {
-      font-size: 13px;
-      margin: 4px 0 0;
-      font-weight: 500;
+    #qrBankLine {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 6px 0 2px;
+    }
+    #qrNameLine {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0;
     }
 
     .button-container {
@@ -193,16 +198,20 @@
         padding-right: 3px !important;
       }
       #qrSection {
-        margin-top: 6px !important;
+        margin-top: 8px !important;
         padding-top: 4px !important;
       }
       #qrSection img {
-        max-width: 48mm !important;
-        width: 48mm !important;
+        max-width: 58mm !important;
+        width: 58mm !important;
       }
-      #qrLabel {
-        font-size: 11px !important;
-        margin: 2px 0 0 !important;
+      #qrBankLine {
+        font-size: 12px !important;
+        margin: 4px 0 1px !important;
+      }
+      #qrNameLine {
+        font-size: 12px !important;
+        margin: 0 !important;
       }
     }
   </style>
@@ -228,7 +237,8 @@
     <!-- Vùng QR (chỉ hiện khi chọn) -->
     <div id="qrSection">
       <img id="qrImage" src="" alt="QR thanh toán" />
-      <p id="qrLabel"></p>
+      <p id="qrBankLine"></p>
+      <p id="qrNameLine"></p>
     </div>
   </div>
 
@@ -240,25 +250,33 @@
         <label>
           <input type="radio" name="bankQr" value="thien-hkd"
                  data-src="https://img.vietqr.io/image/MB-9918667365-compact.svg"
-                 data-label="HKD MB Bank - NGUYEN PHI THIEN">
+                 data-bank="HKD MB Bank"
+                 data-stk="9918667365"
+                 data-name="NGUYEN PHI THIEN">
           HKD MB Bank
         </label>
         <label>
           <input type="radio" name="bankQr" value="thien-mb"
                  data-src="https://img.vietqr.io/image/MB-918667365-compact.svg"
-                 data-label="MB Bank - NGUYEN PHI THIEN">
+                 data-bank="MB Bank"
+                 data-stk="918667365"
+                 data-name="NGUYEN PHI THIEN">
           MB Bank
         </label>
         <label>
           <input type="radio" name="bankQr" value="thien-tp"
                  data-src="https://img.vietqr.io/image/ICB-0918667365-compact.svg"
-                 data-label="TP Bank - NGUYEN PHI THIEN">
+                 data-bank="TP Bank"
+                 data-stk="0918667365"
+                 data-name="NGUYEN PHI THIEN">
           TP Bank
         </label>
         <label>
           <input type="radio" name="bankQr" value="thien-vtb"
                  data-src="https://img.vietqr.io/image/ICB-0918667365-compact.svg"
-                 data-label="VietinBank - NGUYEN PHI THIEN">
+                 data-bank="VietinBank"
+                 data-stk="0918667365"
+                 data-name="NGUYEN PHI THIEN">
           VietinBank
         </label>
       </div>
@@ -270,19 +288,25 @@
         <label>
           <input type="radio" name="bankQr" value="thao-tp"
                  data-src="https://img.vietqr.io/image/TPB-00918369284-compact.svg"
-                 data-label="TP Bank - NGUYEN THU THAO">
+                 data-bank="TP Bank"
+                 data-stk="00918369284"
+                 data-name="NGUYEN THU THAO">
           TP Bank
         </label>
         <label>
           <input type="radio" name="bankQr" value="thao-mb"
                  data-src="https://img.vietqr.io/image/MSB-301120003979-compact.svg"
-                 data-label="MB Bank - NGUYEN THU THAO">
+                 data-bank="MB Bank"
+                 data-stk="301120003979"
+                 data-name="NGUYEN THU THAO">
           MB Bank
         </label>
         <label>
           <input type="radio" name="bankQr" value="thao-vtb"
                  data-src="https://img.vietqr.io/image/ICB-109887493576-compact.svg"
-                 data-label="VietinBank - NGUYEN THU THAO">
+                 data-bank="VietinBank"
+                 data-stk="109887493576"
+                 data-name="NGUYEN THU THAO">
           VietinBank
         </label>
       </div>
@@ -450,14 +474,18 @@
     // ====================== XỬ LÝ CHỌN QR ======================
     const qrSection = document.getElementById('qrSection');
     const qrImage = document.getElementById('qrImage');
-    const qrLabel = document.getElementById('qrLabel');
+    const qrBankLine = document.getElementById('qrBankLine');
+    const qrNameLine = document.getElementById('qrNameLine');
     const radios = document.querySelectorAll('input[name="bankQr"]');
 
     radios.forEach(radio => {
       radio.addEventListener('change', function () {
         if (this.checked) {
           qrImage.src = this.dataset.src;
-          qrLabel.textContent = this.dataset.label;
+          // Dòng 1: Bank + STK
+          qrBankLine.textContent = `${this.dataset.bank} ${this.dataset.stk}`;
+          // Dòng 2: Tên
+          qrNameLine.textContent = this.dataset.name;
           qrSection.style.display = 'block';
         }
       });
@@ -470,7 +498,8 @@
           this.checked = false;
           qrSection.style.display = 'none';
           qrImage.src = '';
-          qrLabel.textContent = '';
+          qrBankLine.textContent = '';
+          qrNameLine.textContent = '';
         }
         radios.forEach(r => r.wasChecked = false);
         this.wasChecked = this.checked;
