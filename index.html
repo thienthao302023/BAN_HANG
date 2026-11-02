@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="pageTitle">[MÃ ĐƠN HÀNG]</title>
-  <!-- Google Font hỗ trợ tiếng Việt tốt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -55,6 +54,71 @@
       text-align: right;
       padding-right: 5px;
     }
+
+    /* ===== Phần chọn ngân hàng ===== */
+    .bank-select {
+      margin: 15px 10px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .bank-group {
+      margin-bottom: 14px;
+    }
+    .bank-group:last-child {
+      margin-bottom: 0;
+    }
+    .bank-group strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    .bank-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+    }
+    .bank-options label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #fff;
+      border: 1px solid #ccc;
+      user-select: none;
+    }
+    .bank-options label:hover {
+      border-color: #1976d2;
+      background: #e3f2fd;
+    }
+    .bank-options input[type="radio"] {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* QR hiện dưới hoá đơn */
+    #qrSection {
+      display: none;
+      text-align: center;
+      margin-top: 12px;
+      padding-top: 8px;
+    }
+    #qrSection img {
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+    }
+    #qrLabel {
+      font-size: 13px;
+      margin: 4px 0 0;
+      font-weight: 500;
+    }
+
     .button-container {
       margin: 10px;
       text-align: center;
@@ -75,17 +139,15 @@
     #sharePdfBtn:hover { background-color: #c2185b; }
     #savePdfBtn { background-color: #4caf50; }
     #savePdfBtn:hover { background-color: #388e3c; }
-    /* Nút IN PC */
     #printPcBtn { background-color: #1976d2; }
     #printPcBtn:hover { background-color: #1565c0; }
 
-    /* ====================== CSS KHI IN (chỉ áp dụng khi window.print / IN PC) ====================== */
+    /* ====================== CSS KHI IN ====================== */
     @media print {
       @page {
         size: 72mm auto;
         margin: 0 !important;
       }
-
       html, body {
         margin: 0 !important;
         padding: 0 !important;
@@ -94,29 +156,25 @@
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
-
-      .button-container {
+      .button-container,
+      .bank-select {
         display: none !important;
       }
-
       .invoice {
         width: 72mm !important;
         max-width: 72mm !important;
         margin: 0 !important;
-        padding: 1mm 0.5mm 1mm 1.5mm !important; /* Trái 1.5mm giữ đường kẻ, phải chỉ 0.5mm */
+        padding: 1mm 0.5mm 1mm 1.5mm !important;
         box-sizing: border-box;
       }
-
       .header {
         font-size: 22px !important;
         margin-bottom: 4px !important;
       }
-
       .info p {
         font-size: 14px !important;
         margin: 2px 0 !important;
       }
-
       table {
         width: 100% !important;
         border-collapse: collapse !important;
@@ -124,18 +182,27 @@
         border: 1px solid #000 !important;
         margin: 0 !important;
       }
-
       th, td {
         padding: 2px 3px !important;
         border: 1px solid #000 !important;
       }
-
       #invoiceTable td:nth-child(1) {
         padding-left: 3px !important;
       }
-
       #invoiceTable td:not(:nth-child(1)) {
         padding-right: 3px !important;
+      }
+      #qrSection {
+        margin-top: 6px !important;
+        padding-top: 4px !important;
+      }
+      #qrSection img {
+        max-width: 48mm !important;
+        width: 48mm !important;
+      }
+      #qrLabel {
+        font-size: 11px !important;
+        margin: 2px 0 0 !important;
       }
     }
   </style>
@@ -157,13 +224,78 @@
         <th>T.TIỀN</th>
       </tr>
     </table>
+
+    <!-- Vùng QR (chỉ hiện khi chọn) -->
+    <div id="qrSection">
+      <img id="qrImage" src="" alt="QR thanh toán" />
+      <p id="qrLabel"></p>
+    </div>
   </div>
+
+  <!-- ===== Chọn tài khoản ngân hàng ===== -->
+  <div class="bank-select" id="bankSelect">
+    <div class="bank-group">
+      <strong>NGUYEN PHI THIEN</strong>
+      <div class="bank-options">
+        <label>
+          <input type="radio" name="bankQr" value="thien-hkd"
+                 data-src="https://img.vietqr.io/image/MB-9918667365-compact.svg"
+                 data-label="HKD MB Bank - NGUYEN PHI THIEN">
+          HKD MB Bank
+        </label>
+        <label>
+          <input type="radio" name="bankQr" value="thien-mb"
+                 data-src="https://img.vietqr.io/image/MB-918667365-compact.svg"
+                 data-label="MB Bank - NGUYEN PHI THIEN">
+          MB Bank
+        </label>
+        <label>
+          <input type="radio" name="bankQr" value="thien-tp"
+                 data-src="https://img.vietqr.io/image/ICB-0918667365-compact.svg"
+                 data-label="TP Bank - NGUYEN PHI THIEN">
+          TP Bank
+        </label>
+        <label>
+          <input type="radio" name="bankQr" value="thien-vtb"
+                 data-src="https://img.vietqr.io/image/ICB-0918667365-compact.svg"
+                 data-label="VietinBank - NGUYEN PHI THIEN">
+          VietinBank
+        </label>
+      </div>
+    </div>
+
+    <div class="bank-group">
+      <strong>NGUYEN THU THAO</strong>
+      <div class="bank-options">
+        <label>
+          <input type="radio" name="bankQr" value="thao-tp"
+                 data-src="https://img.vietqr.io/image/TPB-00918369284-compact.svg"
+                 data-label="TP Bank - NGUYEN THU THAO">
+          TP Bank
+        </label>
+        <label>
+          <input type="radio" name="bankQr" value="thao-mb"
+                 data-src="https://img.vietqr.io/image/MSB-301120003979-compact.svg"
+                 data-label="MB Bank - NGUYEN THU THAO">
+          MB Bank
+        </label>
+        <label>
+          <input type="radio" name="bankQr" value="thao-vtb"
+                 data-src="https://img.vietqr.io/image/ICB-109887493576-compact.svg"
+                 data-label="VietinBank - NGUYEN THU THAO">
+          VietinBank
+        </label>
+      </div>
+    </div>
+  </div>
+
   <div class="button-container" id="buttonContainer">
     <button id="shareBtn">Chia sẻ</button>
     <button id="sharePdfBtn">Chia sẻ PDF</button>
     <button id="savePdfBtn">Lưu PDF</button>
     <button id="printPcBtn">IN PC</button>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -178,35 +310,44 @@
     const ngayBan = urlParams.get('ngayban') || '[Ngày bán]';
     const ghiChu = urlParams.get('ghichu') || '';
     const data = urlParams.get('data') || '';
+
     document.getElementById('pageTitle').textContent = decodeURIComponent(maDonHang);
+
     const tenKhachValue = decodeURIComponent(tenKhach).trim();
     if (tenKhachValue) {
       document.getElementById('tenKhach').textContent = `Khách hàng: ${tenKhachValue}`;
     } else {
       document.getElementById('tenKhach').style.display = 'none';
     }
+
     document.getElementById('ngayBan').textContent = `Ngày bán: ${decodeURIComponent(ngayBan)}`;
+
     const ghiChuValue = decodeURIComponent(ghiChu).trim();
     if (ghiChuValue) {
       document.getElementById('ghiChu').textContent = `Ghi chú: ${ghiChuValue}`;
     } else {
       document.getElementById('ghiChu').style.display = 'none';
     }
+
     // ====================== XỬ LÝ BẢNG SẢN PHẨM ======================
     const table = document.getElementById('invoiceTable');
     let tongGia = 0;
     let hasAnyCK = false;
     let hasProduct = false;
+
     if (data && data.trim() !== '') {
       const rowsData = decodeURIComponent(data).split('_b_');
       let detailRows = [];
+
       rowsData.forEach(record => {
         if (!record.trim()) return;
         const items = record.split('_a_');
         if (items.length < 4) return;
+
         const sanPham = items[0].replace(/_/g, ',').trim();
         const soLuong = items[1];
         let donGia, thanhTien, ckRaw;
+
         if (items.length >= 5) {
           ckRaw = items[2] || '0';
           donGia = parseInt(items[3].replace(/,/g, '')) || 0;
@@ -216,13 +357,17 @@
           donGia = parseInt(items[2].replace(/,/g, '')) || 0;
           thanhTien = parseInt(items[3].replace(/,/g, '')) || 0;
         }
+
         const ckPercent = parseFloat(ckRaw) * 100 || 0;
         if (ckPercent > 0) hasAnyCK = true;
+
         detailRows.push({ sanPham, soLuong, donGia, ckPercent, thanhTien });
         tongGia += thanhTien;
         hasProduct = true;
       });
+
       detailRows.sort((a, b) => a.sanPham.localeCompare(b.sanPham, 'vi', { sensitivity: 'base' }));
+
       detailRows.forEach(item => {
         const row = table.insertRow();
         row.insertCell(0).textContent = item.sanPham;
@@ -233,12 +378,15 @@
         row.insertCell(4).textContent = item.thanhTien.toLocaleString('vi-VN');
       });
     }
+
     if (!hasAnyCK) {
       document.getElementById('ckHeader').style.display = 'none';
       const ckCells = table.querySelectorAll('td:nth-child(4)');
       ckCells.forEach(cell => cell.style.display = 'none');
     }
+
     const colSpanValue = hasAnyCK ? 4 : 3;
+
     // ====================== CÁC DÒNG TỔNG ======================
     if (hasProduct && tongGia !== 0) {
       const totalRow = table.insertRow();
@@ -250,6 +398,7 @@
       totalCell.style.paddingRight = '5px';
       totalCell.textContent = `${tongGia.toLocaleString('vi-VN')} VNĐ`;
     }
+
     const sauCKValue = Number(decodeURIComponent(sauCK).replace(/,/g, '')) || 0;
     if (hasAnyCK && sauCKValue !== 0) {
       const sauRow = table.insertRow();
@@ -261,6 +410,7 @@
       sauCell.style.paddingRight = '5px';
       sauCell.textContent = `${sauCKValue.toLocaleString('vi-VN')} VNĐ`;
     }
+
     const donCuConValue = Number(decodeURIComponent(donCuCon).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0) {
       const row = table.insertRow();
@@ -272,6 +422,7 @@
       cell.style.paddingRight = '5px';
       cell.textContent = `${donCuConValue.toLocaleString('vi-VN')} VNĐ`;
     }
+
     const khachTraValue = Number(decodeURIComponent(khachTra).replace(/,/g, '')) || 0;
     if (khachTraValue !== 0) {
       const row = table.insertRow();
@@ -283,6 +434,7 @@
       cell.style.paddingRight = '5px';
       cell.textContent = `${khachTraValue.toLocaleString('vi-VN')} VNĐ`;
     }
+
     const tongCongValue = Number(decodeURIComponent(tongCong).replace(/,/g, '')) || 0;
     if (donCuConValue !== 0 || khachTraValue !== 0) {
       const row = table.insertRow();
@@ -294,6 +446,37 @@
       cell.style.paddingRight = '5px';
       cell.textContent = `${tongCongValue.toLocaleString('vi-VN')} VNĐ`;
     }
+
+    // ====================== XỬ LÝ CHỌN QR ======================
+    const qrSection = document.getElementById('qrSection');
+    const qrImage = document.getElementById('qrImage');
+    const qrLabel = document.getElementById('qrLabel');
+    const radios = document.querySelectorAll('input[name="bankQr"]');
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', function () {
+        if (this.checked) {
+          qrImage.src = this.dataset.src;
+          qrLabel.textContent = this.dataset.label;
+          qrSection.style.display = 'block';
+        }
+      });
+    });
+
+    // Cho phép bỏ chọn (click lại radio đã chọn)
+    radios.forEach(radio => {
+      radio.addEventListener('click', function (e) {
+        if (this.wasChecked) {
+          this.checked = false;
+          qrSection.style.display = 'none';
+          qrImage.src = '';
+          qrLabel.textContent = '';
+        }
+        radios.forEach(r => r.wasChecked = false);
+        this.wasChecked = this.checked;
+      });
+    });
+
     // ====================== CHỨC NĂNG ======================
     async function captureInvoice() {
       return await html2canvas(document.getElementById("invoiceContent"), {
@@ -301,6 +484,7 @@
         useCORS: true
       });
     }
+
     async function shareInvoice() {
       try {
         const canvas = await captureInvoice();
@@ -313,6 +497,7 @@
         console.error(e);
       }
     }
+
     async function shareInvoiceAsPdf() {
       try {
         const canvas = await captureInvoice();
@@ -335,6 +520,7 @@
         console.error(e);
       }
     }
+
     async function savePdf() {
       const canvas = await captureInvoice();
       const imgData = canvas.toDataURL('image/png');
@@ -349,20 +535,19 @@
       pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
       pdf.save(`hoa_don_${maDonHang}.pdf`);
     }
-    // ========== NÚT IN PC ==========
+
     function printPc() {
-      // 1. Ẩn hết nút
       document.getElementById('buttonContainer').style.display = 'none';
-      // 2. Đợi 1 chút cho DOM cập nhật rồi mới mở hộp thoại in
+      document.getElementById('bankSelect').style.display = 'none';
       setTimeout(() => {
         window.print();
-        // 3. Sau khi đóng hộp thoại in → hiện lại nút (nếu người dùng Cancel)
         setTimeout(() => {
           document.getElementById('buttonContainer').style.display = 'block';
+          document.getElementById('bankSelect').style.display = 'block';
         }, 500);
       }, 100);
     }
-    // Gắn sự kiện
+
     document.getElementById("shareBtn").addEventListener("click", shareInvoice);
     document.getElementById("sharePdfBtn").addEventListener("click", shareInvoiceAsPdf);
     document.getElementById("savePdfBtn").addEventListener("click", savePdf);
