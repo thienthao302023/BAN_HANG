@@ -250,7 +250,7 @@
         <label>
           <input type="radio" name="bankQr" value="thien-hkd"
                  data-src="https://img.vietqr.io/image/MB-9918667365-qr_only.svg"
-                 data-bank="HKD MB Bank"
+                 data-bank="MB Bank "
                  data-stk="9918667365"
                  data-name="NGUYEN PHI THIEN">
           HKD MB Bank
@@ -483,7 +483,7 @@
         if (this.checked) {
           qrImage.src = this.dataset.src;
           // Dòng 1: Bank + STK
-          qrBankLine.textContent = `${this.dataset.bank} ${this.dataset.stk}`;
+          qrBankLine.textContent = `${this.dataset.bank} - ${this.dataset.stk}`;
           // Dòng 2: Tên
           qrNameLine.textContent = this.dataset.name;
           qrSection.style.display = 'block';
